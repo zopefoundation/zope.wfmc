@@ -711,8 +711,8 @@ finish it, submitting a document:
     Transition(Activity('Publication.prepare'), Activity('Publication.tech2'))
     ActivityStarted(Activity('Publication.tech2'))
 
-Notice that we transitioned to *two* activities, `tech1' and
-`tech2'.  This is because the prepare activity has an "and" split.
+Notice that we transitioned to *two* activities, `tech1` and
+`tech2`.  This is because the prepare activity has an "and" split.
 Now we'll do a tech review.  Let's see what tech1 has:
 
     >>> item = tech1.work_list.pop()
