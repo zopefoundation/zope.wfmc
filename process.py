@@ -146,12 +146,15 @@ class ActivityDefinition:
 
     def definePerformer(self, performer):
         self.performer = performer
-        
+
+def always_true(data):
+    return True
+
 class TransitionDefinition:
 
     interface.implements(interfaces.ITransitionDefinition)
 
-    def __init__(self, from_, to, condition=lambda data: True):
+    def __init__(self, from_, to, condition=always_true):
         self.from_ = from_
         self.to = to
         self.condition = condition

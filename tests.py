@@ -89,6 +89,37 @@ def test_multiple_input_parameters():
 
     """
 
+def test_pickling():
+    """
+    >>> from zope.wfmc import process
+    >>> pd = process.ProcessDefinition('sample')
+    >>> from zope import component, interface
+    >>> component.provideUtility(pd, name=pd.id)
+
+    >>> pd.defineActivities(
+    ...    eek = process.ActivityDefinition(),
+    ...    ook = process.ActivityDefinition(),
+    ...    )
+
+    >>> pd.defineTransitions(process.TransitionDefinition('eek', 'ook'))
+
+    >>> pd.defineApplications(
+    ...     eek = process.Application(
+    ...         process.InputParameter('x'),
+    ...         process.InputParameter('y'),
+    ...         )
+    ...     )
+
+    >>> pd.activities['eek'].addApplication('eek', ['x', 'y'])
+
+
+    >>> proc = pd()
+
+    >>> import pickle
+    >>> s = pickle.dumps(proc)
+
+    """
+
 
 def test_suite():
     from zope.testing import doctest
