@@ -21,7 +21,7 @@ process::
   ----------   ---------- /   -----------
   | Author |-->| Review |-    ----------
   ----------   ---------- \-->| Reject |
-                              ----------  
+                              ----------
 
 Here we have a single start activity and 2 end activities.  We could
 have modeled this with a single end activity, but that is not
@@ -89,7 +89,7 @@ we see that we transition immediately into the author activity, then
 into review and publish.  Normally, we'd need to do some work in each
 activity, and transitions would continue only after work had been
 done, however, in this case, we didn't define any work, so each
-activity completed immediately.  
+activity completed immediately.
 
 Note that we didn't transition into the rejected activity.  By
 default, when an activity is completed, the first transition for which
@@ -143,7 +143,7 @@ We used the same names for the applications that we used for our
 activities. This isn't required, but is a common practice.  Note that
 the `review` application includes a specification of an output
 parameter.  Now that we've defined our applications, we need to modify
-our activites to use them:
+our activities to use them:
 
     >>> pd.activities['author'].addApplication('author')
     >>> pd.activities['review'].addApplication('review',
@@ -156,15 +156,15 @@ the application definition for the 'review' application, we again
 specified an output arguments definition. Why do we specify the output
 parameter for both the application definition and the application
 assignment?  The parameters in the application definition are "formal
-paramerters".  The paramerters in the application assignment are
-"actual parameters".  Parameters are posistional. The names (but not
+parameters".  The parameters in the application assignment are
+"actual parameters".  Parameters are positional. The names (but not
 the direction) are allowed to differ.  The names of the actual
 parameters are used to access or update workflow-relevant data.  In
 this example, the output parameter, will be used to add a `publish`
 attribute to the workflow relevant data.
 
 We've declared some applications, and we've wired them up to
-activitis, but we still haven't specified any application code. Before
+activities, but we still haven't specified any application code. Before
 we can specify application code, we need to consider who will be
 performing the application.  Workflow applications are normally
 executed by people, or other external actors.  As with applications,
@@ -193,7 +193,7 @@ qualified name, consisting of the process-definition identifier, a
 dot, and the performer's participant identifier. If an adapter can't
 be found with that name, it tries again using just a dot followed by
 the participant identifier.  This way, participant adapters can be
-shared accross multiple process definitions, or provided for a
+shared across multiple process definitions, or provided for a
 specific definition.  If an activity doesn't have a performer, then
 procedure above is used with an empty participant id.  We first look
 for an adapter with a name consisting of the process id followed by a
@@ -248,31 +248,31 @@ And finally, we can define adapters that implement our application:
 
     >>> class Author(ApplicationBase):
     ...     pass
-    
+
     >>> zope.component.provideAdapter(Author, name=".author")
 
     >>> class Review(ApplicationBase):
     ...     def finish(self, publish):
     ...         self.participant.activity.workItemFinished(self, publish)
-    
+
     >>> zope.component.provideAdapter(Review, name=".review")
 
     >>> class Publish(ApplicationBase):
     ...     def start(self):
     ...         print "Published"
     ...         self.finish()
-    
+
     >>> zope.component.provideAdapter(Publish, name=".publish")
 
     >>> class Reject(ApplicationBase):
     ...     def start(self):
     ...         print "Rejected"
     ...         self.finish()
-    
+
     >>> zope.component.provideAdapter(Reject, name=".reject")
 
 Now, when we instantiate and start our workflow:
-  
+
     >>> proc = pd()
     >>> proc.start()
     ... # doctest: +NORMALIZE_WHITESPACE
@@ -297,7 +297,7 @@ Now we can finish the work item, by calling it's finish method:
 
 We see that we transitioned to the review activity.  Note that the
 `finish` method isn't a part of the workflow APIs.  It was defined by
-our sample classes. Other applications could use fifferent mechanisms.
+our sample classes. Other applications could use different mechanisms.
 
 Now, we'll finish the review process by calling the review work item's
 `finish`. We'll pass `False`, indicating that the content should not
@@ -335,10 +335,10 @@ process shown below::
       |
       V
   -----------
-  | Prepare |<------------------------------\                
+  | Prepare |<------------------------------\
   -----------                                \
       |        ------------                   \
-      |        | Tech     |--------------- \   \   
+      |        | Tech     |--------------- \   \
       |------->| Review 1 |                 V   |
       |        ------------  ----------    -------------
        \                     | Tech   |    | Editorial |   ----------
@@ -357,7 +357,7 @@ process shown below::
 
 Here we've arranged the process diagram into columns, with the
 activities for each participant. We have four participants, the
-author, twp technical reviewers, and an editorial reviewer.  The
+author, two technical reviewers, and an editorial reviewer.  The
 author prepares a draft.  The author sends the draft to *both*
 technical reviewers for review.  When the technical reviews have
 completed, the editorial review does an initial editorial
@@ -368,7 +368,7 @@ review. Based on the technical reviews, the editor may choose to:
 - Publish the document as is
 
 - Request technical changes (based on the technical reviewers'
-  commonents), or
+  comments), or
 
 - Request editorial changes.
 
@@ -426,25 +426,25 @@ We define our transitions:
     ...     process.TransitionDefinition('tech2', 'review'),
     ...
     ...     process.TransitionDefinition(
-    ...         'review', 'reject', 
+    ...         'review', 'reject',
     ...         condition=lambda data: not data.publish
     ...         ),
     ...     process.TransitionDefinition(
-    ...         'review', 'prepare', 
+    ...         'review', 'prepare',
     ...         condition=lambda data: data.tech_changes
     ...         ),
     ...     process.TransitionDefinition(
-    ...         'review', 'final', 
+    ...         'review', 'final',
     ...         condition=lambda data: data.ed_changes
     ...         ),
-    ...     process.TransitionDefinition('review', 'publish'), 
+    ...     process.TransitionDefinition('review', 'publish'),
     ...
     ...     process.TransitionDefinition('final', 'rfinal'),
     ...     process.TransitionDefinition(
-    ...         'rfinal', 'final', 
+    ...         'rfinal', 'final',
     ...         condition=lambda data: data.ed_changes
     ...         ),
-    ...     process.TransitionDefinition('rfinal', 'publish'), 
+    ...     process.TransitionDefinition('rfinal', 'publish'),
     ...     )
 
 We specify our "and" split and join:
@@ -560,7 +560,7 @@ them. Finally, we'll create multiple authors and use the selected one:
     >>> zope.component.provideAdapter(Author, name="Publication.author")
 
 When the process is created, the author name will be passed in and
-assigned to the workflow-relevent data.  Our author class uses this
+assigned to the workflow-relevant data.  Our author class uses this
 information to select the named user.
 
     >>> class Reviewer(Participant):
@@ -618,8 +618,8 @@ preparation, we provide a summary method to show us what we have to do.
 Here we get the document created by the author passed in as an
 argument to the finish method.  In a more realistic implementation,
 the author task would create the document at the start of the task and
-provide a user inyerface for the user to edit it.  We store the
-document as application-relevant data, since we'll want reviewers to 
+provide a user interface for the user to edit it.  We store the
+document as application-relevant data, since we'll want reviewers to
 be able to access it, but we don't need it directly for workflow
 control.
 
@@ -631,7 +631,7 @@ control.
     ...     def finish(self, decision, changes):
     ...         self.activity.workItemFinished(self, decision, changes)
 
-    >>> zope.component.provideAdapter(TechReview, 
+    >>> zope.component.provideAdapter(TechReview,
     ...                               name="Publication.tech_review")
 
 Here, we provided a method to access the original document.
@@ -643,9 +643,9 @@ Here, we provided a method to access the original document.
     ...             # Reject if either tech reviewer rejects
     ...             self.activity.workItemFinished(
     ...                 self, False, changes1 + changes2, ())
-    ...           
+    ...
     ...         if changes1 or changes2:
-    ...             # we won't do anyting if there are tech changes
+    ...             # we won't do anything if there are tech changes
     ...             self.activity.workItemFinished(
     ...                 self, True, changes1 + changes2, ())
     ...
@@ -680,7 +680,7 @@ example.
     >>> zope.component.provideAdapter(Final, name="Publication.final")
 
 In our this application, we simply update the document to reflect
-changes. 
+changes.
 
     >>> class ReviewFinal(TechReview):
     ...
@@ -729,7 +729,7 @@ Notice that we transitioned to *two* activities, `tech1' and
 Now we'll do a tech review.  Let's see what tech1 has:
 
     >>> item = tech1.work_list.pop()
-    >>> print item.getDoc()   
+    >>> print item.getDoc()
     I give my pledge, as an American
     to save, and faithfully to defend from waste
     the natural resources of my Country.
@@ -746,7 +746,7 @@ start it. This is because the editorial review activity has an "and"
 join, meaning that it won't start until both transitions have
 occurred.
 
-Now we'll do the other tectnical review:
+Now we'll do the other technical review:
 
     >>> item = tech2.work_list.pop()
     >>> item.finish(True, ['Change "Country" to "planet"'])
@@ -762,7 +762,7 @@ Now we'll do the other tectnical review:
 Now when we transitioned to the editorial review activity, we started
 it, because each of the input transitions had happened.  Our editorial
 review application automatically sent the work back to preparation,
-because there were technical commments.  Let's address the comments:
+because there were technical comments.  Let's address the comments:
 
     >>> item = authors['bob'].work_list.pop()
     >>> item.summary()
@@ -803,7 +803,7 @@ comments, because the author applied our requested changes:
 
 This time, we are left in the technical review activity because there
 weren't any technical changes. We're ready to do our editorial review.
-Whe'll request an editorial change:
+We'll request an editorial change:
 
     >>> item = reviewer.work_list.pop()
     >>> print item.getDoc()
@@ -862,10 +862,10 @@ addition, the decision was recorded in the process context object:
     >>> context.decision
     True
 
-Comming Soon
+Coming Soon
 ------------
 
-- XPDF support
+- XPDL support
 
 - Timeouts/exceptions
 
