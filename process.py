@@ -19,24 +19,18 @@ $Id$
 import sets
 
 import persistent
+
 import zope.cachedescriptors.property
-import zope.component
+
+from zope import component, interface
+
 import zope.event
-import zope.interface
 
 from zope.wfmc import interfaces
 
-class InvalidProcessDefinition(Exception):
-    """A process definition isn't valid in some way.
-    """
-
-class ProcessError(Exception):
-    """An error occured in execution of a process
-    """
-
 class ProcessDefinition:
 
-    zope.interface.implements(interfaces.IProcessDefinition)
+    interface.implements(interfaces.IProcessDefinition)
 
     def __init__(self, id):
         self.id = id
@@ -97,16 +91,19 @@ class ProcessDefinition:
             if not activity.incoming:
                 start += ((aid, activity), )
                 if not activity.outgoing:
-                    raise InvalidProcessDefinition(
+                    raise interfaces.InvalidProcessDefinition(
                         "Activity %s has no transitions",
                         aid)
 
         if len(start) != 1:
             if start:
-                raise InvalidProcessDefinition("Multiple start activities",
-                                               [id for (id, a) in start])
+                raise interfaces.InvalidProcessDefinition(
+                    "Multiple start activities",
+                    [id for (id, a) in start]
+                    )
             else:
-                raise InvalidProcessDefinition("No start activities")
+                raise interfaces.InvalidProcessDefinition(
+                    "No start activities")
                 
         return TransitionDefinition(None, start[0][0])
         
@@ -123,7 +120,7 @@ class ProcessDefinition:
 
 class ActivityDefinition:
 
-    zope.interface.implements(interfaces.IActivityDefinition)
+    interface.implements(interfaces.IActivityDefinition)
 
     performer = ''
     process = None
@@ -152,7 +149,7 @@ class ActivityDefinition:
         
 class TransitionDefinition:
 
-    zope.interface.implements(interfaces.ITransitionDefinition)
+    interface.implements(interfaces.ITransitionDefinition)
 
     def __init__(self, from_, to, condition=lambda data: True):
         self.from_ = from_
@@ -162,7 +159,7 @@ class TransitionDefinition:
         
 class Process(persistent.Persistent):
 
-    zope.interface.implements(interfaces.IProcess)
+    interface.implements(interfaces.IProcess)
 
     def __init__(self, definition, start, context=None):
         self.process_definition_identifier = definition.id
@@ -174,7 +171,7 @@ class Process(persistent.Persistent):
         self.applicationRelevantData = WorkflowData()
 
     def definition(self):
-        return zope.component.getUtility(
+        return component.getUtility(
             interfaces.IProcessDefinition,
             self.process_definition_identifier,
             )
@@ -189,7 +186,7 @@ class Process(persistent.Persistent):
         args = arguments
         for parameter in definition.parameters:
             if parameter.input:
-                arg, args = arguments[0], args[1:]
+                arg, args = args[0], args[1:]
                 setattr(data, parameter.__name__, arg)
         if args:
             raise TypeError("Too many arguments. Expected %s. got %s",
@@ -250,6 +247,7 @@ class WorkflowData(persistent.Persistent):
     """
 
 class ProcessStarted:
+    interface.implements(interfaces.IProcessStarted)
 
     def __init__(self, process):
         self.process = process
@@ -258,6 +256,7 @@ class ProcessStarted:
         return "ProcessStarted(%r)" % self.process
 
 class ProcessFinished:
+    interface.implements(interfaces.IProcessFinished)
 
     def __init__(self, process):
         self.process = process
@@ -268,7 +267,7 @@ class ProcessFinished:
 
 class Activity(persistent.Persistent):
 
-    zope.interface.implements(interfaces.IActivity)
+    interface.implements(interfaces.IActivity)
 
     def __init__(self, process, definition):
         self.process = process
@@ -277,23 +276,23 @@ class Activity(persistent.Persistent):
         workitems = {}
         if definition.applications:
 
-            performer = zope.component.queryAdapter(
+            performer = component.queryAdapter(
                 self, interfaces.IParticipant,
                 process.process_definition_identifier
                 + '.' + definition.performer)
 
             if performer is None:
-                performer = zope.component.getAdapter(
+                performer = component.getAdapter(
                     self, interfaces.IParticipant,
                     '.' + definition.performer)
 
             i = 0
             for application, formal, actual in definition.applications:
-                workitem = zope.component.queryAdapter(
+                workitem = component.queryAdapter(
                     performer, interfaces.IWorkItem,
                     process.process_definition_identifier + '.' + application)
                 if workitem is None:
-                    workitem = zope.component.getAdapter(
+                    workitem = component.getAdapter(
                         performer, interfaces.IWorkItem,
                         '.' + application)
                 i += 1
@@ -315,7 +314,7 @@ class Activity(persistent.Persistent):
 
         if definition.andJoinSetting:
             if transition in self.incoming:
-                raise ProcessError(
+                raise interfaces.ProcessError(
                     "Repeated incoming transition while waiting for and "
                     "completion")
             self.incoming += (transition, )
@@ -414,7 +413,7 @@ class ActivityStarted:
 
 class Parameter:
 
-    zope.interface.implements(interfaces.IParameterDefinition)
+    interface.implements(interfaces.IParameterDefinition)
 
     input = output = False
 
@@ -435,7 +434,7 @@ class InputOutputParameter(InputParameter, OutputParameter):
 
 class Application:
 
-    zope.interface.implements(interfaces.IApplicationDefinition)
+    interface.implements(interfaces.IApplicationDefinition)
     
     def __init__(self, *parameters):
         self.parameters = parameters
@@ -445,7 +444,7 @@ class Application:
 
 class Participant:
 
-    zope.interface.implements(interfaces.IParticipantDefinition)
+    interface.implements(interfaces.IParticipantDefinition)
 
     def __init__(self, name=None):
         self.__name__ = name

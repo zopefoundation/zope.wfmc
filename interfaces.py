@@ -16,13 +16,13 @@
 $Id$
 """
 
-import zope.interface
+from zope import interface
 
-class IProcessDefinition(zope.interface.Interface):
+class IProcessDefinition(interface.Interface):
     """Process definition
     """
 
-    id = zope.interface.Attribute("Process-definition identifier")
+    id = interface.Attribute("Process-definition identifier")
 
     def defineActivities(**activities):
         """Add activity definitions to the collection of defined activities
@@ -66,11 +66,11 @@ class IProcessDefinition(zope.interface.Interface):
         
         """
 
-class IActivityDefinition(zope.interface.Interface):
+class IActivityDefinition(interface.Interface):
     """Activity definition
     """
 
-    id = zope.interface.Attribute("Activity identifier")
+    id = interface.Attribute("Activity identifier")
 
     def addApplication(id, *parameters):
         """Declare that the activity uses the identified activity
@@ -102,17 +102,17 @@ class IActivityDefinition(zope.interface.Interface):
         If the setting is true, then the activity will use an "and" join.
         """
 
-class ITransitionDefinition(zope.interface.Interface):
+class ITransitionDefinition(interface.Interface):
     """Activity definition
     """
 
-class IProcess(zope.interface.Interface):
+class IProcess(interface.Interface):
     """Process instance
     """
 
-    definition = zope.interface.Attribute("Process definition")
+    definition = interface.Attribute("Process definition")
 
-    workflowRelevantData = zope.interface.Attribute(
+    workflowRelevantData = interface.Attribute(
         """Workflow-relevant data
 
         Object with attributes containing data used in conditions and
@@ -120,7 +120,7 @@ class IProcess(zope.interface.Interface):
         """
         )
 
-    applicationRelevantData = zope.interface.Attribute(
+    applicationRelevantData = interface.Attribute(
         """Application-relevant data
 
         Object with attributes containing data used to pass data as
@@ -129,7 +129,7 @@ class IProcess(zope.interface.Interface):
         """
         )
 
-class IProcessContext(zope.interface.Interface):
+class IProcessContext(interface.Interface):
     """Object that can recieve process results.
     """
 
@@ -137,53 +137,53 @@ class IProcessContext(zope.interface.Interface):
         """Recieve notification of process completion, with results
         """
 
-class IActivity(zope.interface.Interface):
+class IActivity(interface.Interface):
     """Activity instance
     """
 
-    id = zope.interface.Attribute(
+    id = interface.Attribute(
         """Activity identifier
 
         This identifier is set by the process instance
 
         """)
 
-    definition = zope.interface.Attribute("Activity definition")
+    definition = interface.Attribute("Activity definition")
 
     def workItemFinished(work_item, *results):
         """Notify the activity that the work item has been completed.
         """
 
-class IApplicationDefinition(zope.interface.Interface):
+class IApplicationDefinition(interface.Interface):
     """Application definition
     """
 
-    parameters = zope.interface.Attribute(
+    parameters = interface.Attribute(
         "A sequence of parameter definitions")
 
-class IParameterDefinition(zope.interface.Interface):
+class IParameterDefinition(interface.Interface):
     """Parameter definition
     """
 
-    name = zope.interface.Attribute("Parameter name")
+    name = interface.Attribute("Parameter name")
 
-    input = zope.interface.Attribute("Is this an input parameter?")
+    input = interface.Attribute("Is this an input parameter?")
 
-    output = zope.interface.Attribute("Is this an output parameter?")
+    output = interface.Attribute("Is this an output parameter?")
 
-class IParticipantDefinition(zope.interface.Interface):
+class IParticipantDefinition(interface.Interface):
     """Participant definition
     """
 
-class IParticipant(zope.interface.Interface):
+class IParticipant(interface.Interface):
     """Workflow participant
     """
 
-class IWorkItem(zope.interface.Interface):
+class IWorkItem(interface.Interface):
     """Work items
     """
 
-    id = zope.interface.Attribute(
+    id = interface.Attribute(
         """Item identifier
 
         This identifier is set by the activity instance
@@ -193,3 +193,24 @@ class IWorkItem(zope.interface.Interface):
     def start(*arguments):
         """Start the work
         """
+
+
+class InvalidProcessDefinition(Exception):
+    """A process definition isn't valid in some way.
+    """
+
+class ProcessError(Exception):
+    """An error occured in execution of a process
+    """
+
+class IProcessStarted(interface.Interface):
+    """A process has begun executing
+    """
+
+    process = interface.Attribute("The process")
+
+class IProcessFinished(interface.Interface):
+    """A process has finished executing
+    """
+
+    process = interface.Attribute("The process")
