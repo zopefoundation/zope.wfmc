@@ -26,7 +26,6 @@ def tearDown(test):
 
 def setUp(test):
     test.globs['this_directory'] = os.path.split(__file__)[0]
-    test.globs['os'] = os
     placelesssetup.setUp(test)
 
 def test_suite():
