@@ -18,22 +18,22 @@ $Id$
 import os
 import unittest
 import zope.event
-from zope.component.tests import placelesssetup
+from zope.component import testing
 
 def tearDown(test):
-    placelesssetup.tearDown(test)
+    testing.tearDown(test)
     zope.event.subscribers.pop()
 
 def setUp(test):
     test.globs['this_directory'] = os.path.dirname(__file__)
-    placelesssetup.setUp(test)
+    testing.setUp(test)
 
 def test_suite():
     from zope.testing import doctest
     suite = unittest.TestSuite()
     # suite.addTest(doctest.DocTestSuite())
     suite.addTest(doctest.DocFileSuite('README.txt', tearDown=tearDown,
-                                       setUp=placelesssetup.setUp))
+                                       setUp=testing.setUp))
     suite.addTest(doctest.DocFileSuite(
         'xpdl.txt', tearDown=tearDown, setUp=setUp,
         optionflags=doctest.NORMALIZE_WHITESPACE))
