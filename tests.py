@@ -25,7 +25,7 @@ def tearDown(test):
     zope.event.subscribers.pop()
 
 def setUp(test):
-    test.globs['this_directory'] = os.path.split(__file__)[0]
+    test.globs['this_directory'] = os.path.dirname(__file__)
     placelesssetup.setUp(test)
 
 def test_suite():
