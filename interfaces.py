@@ -24,6 +24,24 @@ class IProcessDefinition(interface.Interface):
 
     id = interface.Attribute("Process-definition identifier")
 
+    __name__ = interface.Attribute("Name")
+
+    description = interface.Attribute("Description")
+
+    participants = interface.Attribute(
+        """Process participants
+
+        This is a mapping from participant id to participant definitions
+        """
+        )
+
+    applications = interface.Attribute(
+        """Process applications
+
+        This is a mapping from application id to participant definitions
+        """
+        )
+
     def defineActivities(**activities):
         """Add activity definitions to the collection of defined activities
 
@@ -158,6 +176,10 @@ class IApplicationDefinition(interface.Interface):
     """Application definition
     """
 
+    __name__ = interface.Attribute("Name")
+
+    description = interface.Attribute("Description")
+
     parameters = interface.Attribute(
         "A sequence of parameter definitions")
 
@@ -178,6 +200,10 @@ class IParticipantDefinition(interface.Interface):
 class IParticipant(interface.Interface):
     """Workflow participant
     """
+
+    __name__ = interface.Attribute("Name")
+
+    description = interface.Attribute("Description")
 
 class IWorkItem(interface.Interface):
     """Work items
