@@ -146,22 +146,21 @@ parameter.  Now that we've defined our applications, we need to modify
 our activities to use them:
 
     >>> pd.activities['author'].addApplication('author')
-    >>> pd.activities['review'].addApplication('review',
-    ...     process.OutputParameter('publish'))
+    >>> pd.activities['review'].addApplication('review', ['publish'])
     >>> pd.activities['publish'].addApplication('publish')
     >>> pd.activities['reject'].addApplication('reject')
 
-An activity can use many applications, so we call `addApplication`.  In
-the application definition for the 'review' application, we again
-specified an output arguments definition. Why do we specify the output
-parameter for both the application definition and the application
-assignment?  The parameters in the application definition are "formal
-parameters".  The parameters in the application assignment are
-"actual parameters".  Parameters are positional. The names (but not
-the direction) are allowed to differ.  The names of the actual
-parameters are used to access or update workflow-relevant data.  In
-this example, the output parameter, will be used to add a `publish`
-attribute to the workflow relevant data.
+An activity can use many applications, so we call `addApplication`.
+In the application definition for the 'review' application, we
+provided the name of a workflow-relevent data variable corresponding
+to the output parameter defined for the application.  When using an
+application in an activity, a workflow-relevent data variable name
+must be provided for each of the parameters in the identified
+applications's signature.  When an application is used in an activity,
+workflow-relevent data are passed for each of the input parameters and
+are set by each of the output parameters. In this example, the output
+parameter, will be used to add a `publish` attribute to the workflow
+relevant data.
 
 We've declared some applications, and we've wired them up to
 activities, but we still haven't specified any application code. Before
@@ -489,28 +488,17 @@ We define our participants and applications:
 
     >>> Publication.activities['tech1'].definePerformer('tech1')
     >>> Publication.activities['tech1'].addApplication(
-    ...     'tech_review',
-    ...     process.OutputParameter('publish1'),
-    ...     process.OutputParameter('tech_changes1'),
-    ...     )
+    ...     'tech_review', ['publish1', 'tech_changes1'])
 
     >>> Publication.activities['tech2'].definePerformer('tech2')
     >>> Publication.activities['tech2'].addApplication(
-    ...     'tech_review',
-    ...     process.OutputParameter('publish2'),
-    ...     process.OutputParameter('tech_changes2'),
-    ...     )
+    ...     'tech_review', ['publish2', 'tech_changes2'])
 
     >>> Publication.activities['review'].definePerformer('reviewer')
     >>> Publication.activities['review'].addApplication(
     ...     'ed_review',
-    ...     process.InputParameter('publish1'),
-    ...     process.InputParameter('tech_changes1'),
-    ...     process.InputParameter('publish2'),
-    ...     process.InputParameter('tech_changes2'),
-    ...     process.OutputParameter('publish'),
-    ...     process.OutputParameter('tech_changes'),
-    ...     process.OutputParameter('ed_changes'),
+    ...     ['publish1', 'tech_changes1', 'publish2', 'tech_changes2',
+    ...      'publish', 'tech_changes', 'ed_changes'],
     ...     )
 
     >>> Publication.activities['final'].definePerformer('author')
@@ -518,8 +506,7 @@ We define our participants and applications:
 
     >>> Publication.activities['rfinal'].definePerformer('reviewer')
     >>> Publication.activities['rfinal'].addApplication(
-    ...     'rfinal',
-    ...     process.OutputParameter('ed_changes'),
+    ...     'rfinal', ['ed_changes'],
     ...     )
 
     >>> Publication.activities['publish'].addApplication('publish')

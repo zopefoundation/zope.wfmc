@@ -46,6 +46,9 @@ class ProcessDefinition:
         self.participants = {}
         self.parameters = ()
 
+    def __repr__(self):
+        return "ProcessDefinition(%r)" % self.id
+
     def defineActivities(self, **activities):
         self._dirty()
         for id, activity in activities.items():
@@ -137,18 +140,12 @@ class ActivityDefinition:
     def andJoin(self, setting):
         self.andJoinSetting = setting
 
-    def addApplication(self, application, *parameters):
+    def addApplication(self, application, actual=()):
         formal = self.process.applications[application].parameters
-        if len(formal) != len(parameters):
+        if len(formal) != len(actual):
             raise TypeError("Wrong number of parameters")
-
-        for formal, parameter in zip(formal, parameters):
-            if (formal.input != parameter.input
-                or formal.output != parameter.output
-                ):
-                raise TypeError("Parameter type missmatch")
         
-        self.applications += ((application, parameters), )
+        self.applications += ((application, formal, tuple(actual)), )
 
     def definePerformer(self, performer):
         self.performer = performer
@@ -291,7 +288,7 @@ class Activity(persistent.Persistent):
                     '.' + definition.performer)
 
             i = 0
-            for application, parameters in definition.applications:
+            for application, formal, actual in definition.applications:
                 workitem = zope.component.queryAdapter(
                     performer, interfaces.IWorkItem,
                     process.process_definition_identifier + '.' + application)
@@ -301,7 +298,7 @@ class Activity(persistent.Persistent):
                         '.' + application)
                 i += 1
                 workitem.id = i
-                workitems[i] = workitem, application, parameters
+                workitems[i] = workitem, application, formal, actual
         
         self.workitems = workitems
 
@@ -329,34 +326,32 @@ class Activity(persistent.Persistent):
         zope.event.notify(ActivityStarted(self))
         
         if self.workitems:
-            for workitem, application, parameters in self.workitems.values():
+            for workitem, app, formal, actual in self.workitems.values():
                 args = []
-                for parameter in parameters:
+                for parameter, name in zip(formal, actual):
                     if parameter.input:
                         args.append(
-                            getattr(self.process.workflowRelevantData,
-                                    parameter.__name__))
+                            getattr(self.process.workflowRelevantData, name))
                 workitem.start(*args)
         else:
             # Since we don't have any work items, we're done
             self.finish()
 
     def workItemFinished(self, work_item, *results):
-        unused, application, parameters = self.workitems.pop(work_item.id)
+        unused, app, formal, actual = self.workitems.pop(work_item.id)
         self._p_changed = True
         res = results
-        for parameter in parameters:
+        for parameter, name in zip(formal, actual):
             if parameter.output:
                 v = res[0]
                 res = res[1:]
-                setattr(self.process.workflowRelevantData,
-                        parameter.__name__, v)
+                setattr(self.process.workflowRelevantData, name, v)
 
         if res:
             raise TypeError("Too many results")
 
         zope.event.notify(WorkItemFinished(
-            work_item, application, parameters, results))
+            work_item, app, actual, results))
         
         if not self.workitems:
             self.finish()
@@ -444,6 +439,9 @@ class Application:
     
     def __init__(self, *parameters):
         self.parameters = parameters
+
+    def defineParameters(self, *parameters):
+        self.parameters += parameters
 
 class Participant:
 
