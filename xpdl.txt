@@ -341,3 +341,15 @@ Now, let's try out our process.  We'll follow the same steps we did in
 
     >>> context.decision
     True
+
+Descriptions
+============
+
+Most process elements can have names and descriptions.
+
+    >>> pd.applications['prepare'].__name__
+    u'Prepare'
+
+    >>> pd.applications['prepare'].description
+    u'Prepare the initial draft'
+

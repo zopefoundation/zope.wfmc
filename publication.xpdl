@@ -95,7 +95,9 @@
                 </Participant>
             </Participants>
             <Applications>
-                <Application Id="prepare"/>
+                <Application Id="prepare" Name="Prepare">
+                    <Description>Prepare the initial draft</Description>
+                </Application>
                 <Application Id="tech_review">
                     <FormalParameters>
                         <FormalParameter Id="publish" Mode="OUT">

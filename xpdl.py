@@ -174,6 +174,11 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
         self.stack[-1].defineApplications(**{str(app.id): app})
     end_handlers[(xpdlns, 'Application')] = application
 
+    def description(self, ignored):
+        if self.stack[-1] is not None:
+            self.stack[-1].description = self.text
+    end_handlers[(xpdlns, 'Description')] = description
+
     ######################################################################
     # Activity definitions
 
