@@ -72,7 +72,7 @@ class ProcessDefinition:
     def _start(self):
         # Compute activity incoming and outgoing transitions
         # Return an initial transition
-        
+
         activities = self.activities
 
         # Reinitialize activity transitions
@@ -104,9 +104,9 @@ class ProcessDefinition:
             else:
                 raise interfaces.InvalidProcessDefinition(
                     "No start activities")
-                
+
         return TransitionDefinition(None, start[0][0])
-        
+
     _start = zope.cachedescriptors.property.Lazy(_start)
 
     def __call__(self, context=None):
@@ -141,7 +141,7 @@ class ActivityDefinition:
         formal = self.process.applications[application].parameters
         if len(formal) != len(actual):
             raise TypeError("Wrong number of parameters")
-        
+
         self.applications += ((application, formal, tuple(actual)), )
 
     def definePerformer(self, performer):
@@ -159,7 +159,7 @@ class TransitionDefinition:
         self.to = to
         self.condition = condition
 
-        
+
 class Process(persistent.Persistent):
 
     interface.implements(interfaces.IProcess)
@@ -204,17 +204,15 @@ class Process(persistent.Persistent):
             for parameter in self.definition.parameters:
                 if parameter.output:
                     args.append(
-                        getattr(self.workflowRelevantData,
-                                parameter.__name__))
+                        self.workflowRelevantData.get(parameter.__name__))
             self.context.processFinished(self, *args)
-            
+
         zope.event.notify(ProcessFinished(self))
-        
-        
+
     def transition(self, activity, transitions):
         if transitions:
             definition = self.definition
-            
+
             for transition in transitions:
                 activity_definition = definition.activities[transition.to]
                 next = None
@@ -255,7 +253,7 @@ class WorkflowData(persistent.Persistent):
         return self.__dict__[name]
 
     def get(self, name):
-        return self.dict.get(name)
+        return self.__dict__.get(name)
 
 class ProcessStarted:
     interface.implements(interfaces.IProcessStarted)
@@ -274,7 +272,7 @@ class ProcessFinished:
 
     def __repr__(self):
         return "ProcessFinished(%r)" % self.process
-        
+
 
 class Activity(persistent.Persistent):
 
@@ -309,7 +307,7 @@ class Activity(persistent.Persistent):
                 i += 1
                 workitem.id = i
                 workitems[i] = workitem, application, formal, actual
-        
+
         self.workitems = workitems
 
     def definition(self):
@@ -334,14 +332,14 @@ class Activity(persistent.Persistent):
                 return # not enough incoming yet
 
         zope.event.notify(ActivityStarted(self))
-        
+
         if self.workitems:
             for workitem, app, formal, actual in self.workitems.values():
                 args = []
                 for parameter, name in zip(formal, actual):
                     if parameter.input:
                         args.append(
-                            getattr(self.process.workflowRelevantData, name))
+                            self.process.workflowRelevantData.get(name))
                 workitem.start(*args)
         else:
             # Since we don't have any work items, we're done
@@ -362,7 +360,7 @@ class Activity(persistent.Persistent):
 
         zope.event.notify(WorkItemFinished(
             work_item, app, actual, results))
-        
+
         if not self.workitems:
             self.finish()
 
@@ -446,7 +444,7 @@ class InputOutputParameter(InputParameter, OutputParameter):
 class Application:
 
     interface.implements(interfaces.IApplicationDefinition)
-    
+
     def __init__(self, *parameters):
         self.parameters = parameters
 
