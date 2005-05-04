@@ -121,7 +121,7 @@ take a data object and return a boolean value.  The data object is
 called "workflow-relevant data".  A process instance has a data object
 containing this data.  In the example, above, the condition simply
 returned the value of the `publish` attribute. How does this attribute
-get set? It needs to be set by the review activity. Do to that, we
+get set? It needs to be set by the review activity. To do that, we
 need to arrange for the activity to set the data.  This brings us to
 applications.
 
@@ -311,6 +311,160 @@ be published:
     WorkItemFinished('reject')
     ActivityFinished(Activity('sample.reject'))
     ProcessFinished(Process('sample'))
+
+Ordering output transitions
+---------------------------
+
+Normally, outgoing transitions are ordered in the order of transition
+definition and all transitions from a given activity are used.
+
+If transitions are defined in an inconvenient order, then the workflow
+might not work as expected.  For example, let's modify the above
+process by switching the order of definition of some of the
+transitions:
+
+    >>> pd = process.ProcessDefinition('sample')
+    >>> zope.component.provideUtility(pd, name=pd.id)
+    >>> pd.defineActivities(
+    ...     author = process.ActivityDefinition(),
+    ...     review = process.ActivityDefinition(),
+    ...     publish = process.ActivityDefinition(),
+    ...     reject = process.ActivityDefinition(),
+    ...     )
+    >>> pd.defineTransitions(
+    ...     process.TransitionDefinition('author', 'review'),
+    ...     process.TransitionDefinition('review', 'reject'),
+    ...     process.TransitionDefinition(
+    ...         'review', 'publish', condition=lambda data: data.publish),
+    ...     )
+
+    >>> pd.defineApplications(
+    ...     author = process.Application(),
+    ...     review = process.Application(
+    ...         process.OutputParameter('publish')),
+    ...     publish = process.Application(),
+    ...     reject = process.Application(),
+    ...     )
+
+    >>> pd.activities['author'].addApplication('author')
+    >>> pd.activities['review'].addApplication('review', ['publish'])
+    >>> pd.activities['publish'].addApplication('publish')
+    >>> pd.activities['reject'].addApplication('reject')
+
+    >>> pd.defineParticipants(
+    ...     author   = process.Participant(),
+    ...     reviewer = process.Participant(),
+    ...     )
+
+    >>> pd.activities['author'].definePerformer('author')
+    >>> pd.activities['review'].definePerformer('reviewer')
+
+and run our process:
+
+    >>> proc = pd()
+    >>> proc.start()
+    ... # doctest: +NORMALIZE_WHITESPACE
+    ProcessStarted(Process('sample'))
+    Transition(None, Activity('sample.author'))
+    ActivityStarted(Activity('sample.author'))
+
+    >>> work_list.pop().finish()
+    WorkItemFinished('author')
+    ActivityFinished(Activity('sample.author'))
+    Transition(Activity('sample.author'), Activity('sample.review'))
+    ActivityStarted(Activity('sample.review'))
+
+This time, we'll say that we should publish:
+
+    >>> work_list.pop().finish(True)
+    WorkItemFinished('review')
+    ActivityFinished(Activity('sample.review'))
+    Transition(Activity('sample.review'), Activity('sample.reject'))
+    ActivityStarted(Activity('sample.reject'))
+    Rejected
+    WorkItemFinished('reject')
+    ActivityFinished(Activity('sample.reject'))
+    ProcessFinished(Process('sample'))
+
+But we went to the reject activity anyway. Why? Because transitions
+are tested in order. Because the transition to the reject activity was
+tested first and had no condition, we followed it without checking the
+condition for the transition to the publish activity.  We can fix this
+by specifying outgoing transitions on the reviewer activity directly.
+To do this, we'll also need to specify ids in our transitions.  Let's
+redefine the process:
+
+
+    >>> pd = process.ProcessDefinition('sample')
+    >>> zope.component.provideUtility(pd, name=pd.id)
+    >>> pd.defineActivities(
+    ...     author = process.ActivityDefinition(),
+    ...     review = process.ActivityDefinition(),
+    ...     publish = process.ActivityDefinition(),
+    ...     reject = process.ActivityDefinition(),
+    ...     )
+    >>> pd.defineTransitions(
+    ...     process.TransitionDefinition('author', 'review'),
+    ...     process.TransitionDefinition('review', 'reject', id='reject'),
+    ...     process.TransitionDefinition(
+    ...         'review', 'publish', id='publish',
+    ...         condition=lambda data: data.publish),
+    ...     )
+
+    >>> pd.defineApplications(
+    ...     author = process.Application(),
+    ...     review = process.Application(
+    ...         process.OutputParameter('publish')),
+    ...     publish = process.Application(),
+    ...     reject = process.Application(),
+    ...     )
+
+    >>> pd.activities['author'].addApplication('author')
+    >>> pd.activities['review'].addApplication('review', ['publish'])
+    >>> pd.activities['publish'].addApplication('publish')
+    >>> pd.activities['reject'].addApplication('reject')
+
+    >>> pd.defineParticipants(
+    ...     author   = process.Participant(),
+    ...     reviewer = process.Participant(),
+    ...     )
+
+    >>> pd.activities['author'].definePerformer('author')
+    >>> pd.activities['review'].definePerformer('reviewer')
+
+    >>> pd.activities['review'].addOutgoing('publish')
+    >>> pd.activities['review'].addOutgoing('reject')
+
+Now, when we run the process, we'll go to the publish activity as
+expected:
+
+
+    >>> proc = pd()
+    >>> proc.start()
+    ... # doctest: +NORMALIZE_WHITESPACE
+    ProcessStarted(Process('sample'))
+    Transition(None, Activity('sample.author'))
+    ActivityStarted(Activity('sample.author'))
+
+    >>> work_list.pop().finish()
+    WorkItemFinished('author')
+    ActivityFinished(Activity('sample.author'))
+    Transition(Activity('sample.author'), Activity('sample.review'))
+    ActivityStarted(Activity('sample.review'))
+
+    >>> work_list.pop().finish(True)
+    WorkItemFinished('review')
+    ActivityFinished(Activity('sample.review'))
+    Transition(Activity('sample.review'), Activity('sample.publish'))
+    ActivityStarted(Activity('sample.publish'))
+    Published
+    WorkItemFinished('publish')
+    ActivityFinished(Activity('sample.publish'))
+    ProcessFinished(Process('sample'))
+
+
+Complex Flows
+-------------
 
 Lets look at a more complex example.  In this example, we'll extend
 the process to work with multiple reviewers.  We'll also make the

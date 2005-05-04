@@ -82,6 +82,10 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
         else:
             result = None
 
+        if result is None:
+            # Just dup the top of the stack
+            result = self.stack[-1]
+            
         self.stack.append(result)
         self.text = u''
 
@@ -104,22 +108,11 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
     def setDocumentLocator(self, locator):
         self.locator = locator
 
-    def dup(self, attrs):
-        # Just duplicate whatever is on the top of the stack
-        return self.stack[-1]
-
     ######################################################################
     # Application handlers
 
     # Pointless container elements that we want to "ignore" by having them
     # dup their containers:
-    for tag in (
-        'FormalParameters', 'Participants', 'Applications', 'Activities',
-        'Implementation', 'ActualParameters', 'Transitions',
-        'TransitionRestrictions', 'TransitionRestriction', 
-        ):
-        start_handlers[(xpdlns, tag)] = dup
-
     def Package(self, attrs):
         package = self.package
         package.id = attrs[(None, 'Id')]
@@ -222,6 +215,11 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
         if Type == u'AND':
             self.stack[-1].andSplit(True)
     start_handlers[(xpdlns, 'Split')] = Split
+
+    def TransitionRef(self, attrs):
+        Id = attrs.get((None, 'Id'))
+        self.stack[-1].addOutgoing(Id)
+    start_handlers[(xpdlns, 'TransitionRef')] = TransitionRef
         
 
     # Activity definitions

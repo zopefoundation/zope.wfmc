@@ -179,8 +179,8 @@
                             <Join Type="XOR"/>
                             <Split Type="AND">
                                 <TransitionRefs>
-                                    <TransitionRef Id="Publication_Tra3"/>
                                     <TransitionRef Id="Publication_Tra2"/>
+                                    <TransitionRef Id="Publication_Tra3"/>
                                 </TransitionRefs>
                             </Split>
                         </TransitionRestriction>
@@ -262,9 +262,9 @@
                             <Split Type="XOR">
                                 <TransitionRefs>
                                     <TransitionRef Id="Publication_Tra9"/>
-                                    <TransitionRef Id="Publication_Tra10"/>
                                     <TransitionRef Id="Publication_Tra8"/>
                                     <TransitionRef Id="Publication_Tra7"/>
+                                    <TransitionRef Id="Publication_Tra10"/>
                                 </TransitionRefs>
                             </Split>
                         </TransitionRestriction>

@@ -31,7 +31,14 @@ class IProcessDefinition(interface.Interface):
     participants = interface.Attribute(
         """Process participants
 
-        This is a mapping from participant id to participant definitions
+        This is a mapping from participant id to participant definition
+        """
+        )
+
+    activities = interface.Attribute(
+        """Process activities
+
+        This is a mapping from activity id to activity definition
         """
         )
 

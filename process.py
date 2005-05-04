@@ -56,6 +56,12 @@ class ProcessDefinition:
         self._dirty()
         self.transitions.extend(transitions)
 
+        # Compute activity transitions based on transition data:
+        activities = self.activities
+        for transition in transitions:
+            activities[transition.from_].transitionOutgoing(transition)
+            activities[transition.to].incoming += (transition, )
+
     def defineApplications(self, **applications):
         for id, application in applications.items():
             application.id = id
@@ -70,19 +76,9 @@ class ProcessDefinition:
         self.parameters += parameters
 
     def _start(self):
-        # Compute activity incoming and outgoing transitions
         # Return an initial transition
         
         activities = self.activities
-
-        # Reinitialize activity transitions
-        for activity in activities.values():
-            activity.incoming = activity.outgoing = ()
-
-        # Recompute activity transitions based on transition data:
-        for transition in self.transitions:
-            activities[transition.from_].outgoing += (transition, )
-            activities[transition.to].incoming += (transition, )
 
         # Find the start, making sure that there is one and that there
         # aren't any activities w no transitions:
@@ -128,6 +124,7 @@ class ActivityDefinition:
     def __init__(self, __name__=None):
         self.__name__ = __name__
         self.incoming = self.outgoing = ()
+        self.transition_outgoing = self.explicit_outgoing = ()
         self.applications = ()
         self.andJoinSetting = self.andSplitSetting = False
 
@@ -147,6 +144,25 @@ class ActivityDefinition:
     def definePerformer(self, performer):
         self.performer = performer
 
+    def addOutgoing(self, transition_id):
+        self.explicit_outgoing += (transition_id,)
+        self.computeOutgoing()
+
+    def transitionOutgoing(self, transition):
+        self.transition_outgoing += (transition,)
+        self.computeOutgoing()
+
+    def computeOutgoing(self):
+        if self.explicit_outgoing:
+            transitions = dict([(t.id, t) for t in self.transition_outgoing])
+            self.outgoing = ()
+            for tid in self.explicit_outgoing:
+                transition = transitions.get(tid)
+                if transition is not None:
+                    self.outgoing += (transition,)                    
+        else:
+            self.outgoing = self.transition_outgoing
+        
 def always_true(data):
     return True
 
@@ -154,7 +170,8 @@ class TransitionDefinition:
 
     interface.implements(interfaces.ITransitionDefinition)
 
-    def __init__(self, from_, to, condition=always_true):
+    def __init__(self, from_, to, condition=always_true, id=None):
+        self.id = id
         self.from_ = from_
         self.to = to
         self.condition = condition
