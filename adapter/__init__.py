@@ -16,4 +16,4 @@
 $Id$
 """
 
-from zope.wfmc.component import integration
+from zope.wfmc.adapter import integration

@@ -4,13 +4,13 @@ Adapter-based workflow application integration
 This package provides an adapter-based workflow integration
 component. The component is implemented by the integration module:
 
-    >>> from zope.wfmc import process, component
+    >>> from zope.wfmc import process, adapter
     >>> import zope.component
 
 To demonstrate how this works, we'll use the simple wfmc example
 process:
 
-    >>> pd = process.ProcessDefinition('sample', component.integration)
+    >>> pd = process.ProcessDefinition('sample', adapter.integration)
     >>> zope.component.provideUtility(pd, name=pd.id)
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
