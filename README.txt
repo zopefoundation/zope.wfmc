@@ -162,6 +162,9 @@ are set by each of the output parameters. In this example, the output
 parameter, will be used to add a `publish` attribute to the workflow
 relevant data.
 
+Participants
+------------
+
 We've declared some applications, and we've wired them up to
 activities, but we still haven't specified any application code. Before
 we can specify application code, we need to consider who will be
@@ -183,35 +186,36 @@ can associate them with activities:
     >>> pd.activities['author'].definePerformer('author')
     >>> pd.activities['review'].definePerformer('reviewer')
 
-For each of the participants provided, we need to provide a named
-adapter from an activity instance
-(`zope.wfmc.interfaces.IActivity`) to
-`zope.wfmc.interfaces.IParticipant`.  When a process needs to get a
-participant, it adapts the activity instance to `IParticipant` using a
-qualified name, consisting of the process-definition identifier, a
-dot, and the performer's participant identifier. If an adapter can't
-be found with that name, it tries again using just a dot followed by
-the participant identifier.  This way, participant adapters can be
-shared across multiple process definitions, or provided for a
-specific definition.  If an activity doesn't have a performer, then
-procedure above is used with an empty participant id.  We first look
-for an adapter with a name consisting of the process id followed by a
-dot, and then we look for an adapter with a single dot as it's name.
+Application Integration
+-----------------------
 
-Application implementations are provided as named adapters from
-participants to `zope.wfmc.interfaces.IWorkItem`.  As when looking up
-applications, we first look for an adapter with a name consisting of
-the process-definition id, a dot, and the application id.  If that
-fails, we look for an adapter consisting of a dot followed by the
-application id.  Workflow items provide a `start` method, which is
-used to start the work and pass input arguments.  It is the
-responsibility of the work item, at some later time, to call the
-`workitemFinished` method on the activity, to notify the activity that
-the work item was completed. Output parameters are passed to the
-`workitemFinished` method.
+To use a process definition to control application logic, we need to
+associate it with an "integration" object. 
 
-Let's implement participants for our process. We'll start with a
-generic participant:
+When a process needs to get a participant, it calls createParticipant
+on it's integration attribute, passing the process id and the
+performer id. If an activity doesn't have a
+performer, then procedure above is used with an empty performer id.
+
+Similarly, when a process needs a work item, it calls createWorkItem
+on it's integration attribute, passing the process id and the
+application id.
+
+Work items provide a `start` method, which is used to start the work
+and pass input arguments.  It is the responsibility of the work item,
+at some later time, to call the `workitemFinished` method on the
+activity, to notify the activity that the work item was
+completed. Output parameters are passed to the `workitemFinished`
+method.
+
+A simple way to create integration objects is with
+`zope.wfmc.attributeintegration.AttributeIntegration`.
+
+    >>> from zope.wfmc.attributeintegration import AttributeIntegration
+    >>> integration = AttributeIntegration()
+    >>> pd.integration = integration
+
+We'll start by defining a simple Participant class:
 
     >>> import zope.interface
     >>> from zope.wfmc import interfaces
@@ -223,11 +227,17 @@ generic participant:
     ...     def __init__(self, activity):
     ...         self.activity = activity
 
-    >>> zope.component.provideAdapter(Participant, name=".author")
-    >>> zope.component.provideAdapter(Participant, name=".reviewer")
-    >>> zope.component.provideAdapter(Participant, name=".")
+We set attributes on the integration for each participant:
 
-And finally, we can define adapters that implement our application:
+    >>> integration.authorParticipant   = Participant
+    >>> integration.reviewerParticipant = Participant
+
+We also define an attribute for participants for activities that don't
+have performers:
+
+    >>> integration.Participant = Participant
+
+Now we'll define our work-items. First we'll define some classes:
 
     >>> work_list = []
 
@@ -245,32 +255,32 @@ And finally, we can define adapters that implement our application:
     ...     def finish(self):
     ...         self.participant.activity.workItemFinished(self)
 
-    >>> class Author(ApplicationBase):
-    ...     pass
-
-    >>> zope.component.provideAdapter(Author, name=".author")
-
     >>> class Review(ApplicationBase):
     ...     def finish(self, publish):
     ...         self.participant.activity.workItemFinished(self, publish)
-
-    >>> zope.component.provideAdapter(Review, name=".review")
 
     >>> class Publish(ApplicationBase):
     ...     def start(self):
     ...         print "Published"
     ...         self.finish()
 
-    >>> zope.component.provideAdapter(Publish, name=".publish")
-
     >>> class Reject(ApplicationBase):
     ...     def start(self):
     ...         print "Rejected"
     ...         self.finish()
 
-    >>> zope.component.provideAdapter(Reject, name=".reject")
+and then we'll hook them up with the integration object:
 
-Now, when we instantiate and start our workflow:
+    >>> integration.authorWorkItem  = ApplicationBase
+    >>> integration.reviewWorkItem  = Review
+    >>> integration.publishWorkItem = Publish
+    >>> integration.rejectWorkItem  = Reject
+
+Using workflow processes
+------------------------
+
+To use a process definition, instantiate it and call it's start method
+to start execution:
 
     >>> proc = pd()
     >>> proc.start()
@@ -321,9 +331,10 @@ definition and all transitions from a given activity are used.
 If transitions are defined in an inconvenient order, then the workflow
 might not work as expected.  For example, let's modify the above
 process by switching the order of definition of some of the
-transitions:
+transitions.  We'll reuse our integration object from the previous
+example by passing it to the definition constructor:
 
-    >>> pd = process.ProcessDefinition('sample')
+    >>> pd = process.ProcessDefinition('sample', integration)
     >>> zope.component.provideUtility(pd, name=pd.id)
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
@@ -395,7 +406,7 @@ To do this, we'll also need to specify ids in our transitions.  Let's
 redefine the process:
 
 
-    >>> pd = process.ProcessDefinition('sample')
+    >>> pd = process.ProcessDefinition('sample', integration)
     >>> zope.component.provideUtility(pd, name=pd.id)
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
@@ -549,9 +560,11 @@ In this example, the "Prepare" activity has an "and" split.  Work
 flows simultaneously to the two technical review activities.  The rest
 of the splits in this example are "xor" splits.
 
-Lets create our new workflow process:
+Lets create our new workflow process. We'll reuse our existing
+integration object:
 
     >>> Publication = process.ProcessDefinition('Publication')
+    >>> Publication.integration = integration
     >>> zope.component.provideUtility(Publication, name=Publication.id)
 
     >>> Publication.defineActivities(
@@ -698,7 +711,9 @@ them. Finally, we'll create multiple authors and use the selected one:
     ...         author_name = activity.process.workflowRelevantData.author
     ...         self.user = authors[author_name]
 
-    >>> zope.component.provideAdapter(Author, name="Publication.author")
+In this example, we need to define a separate attribute for each participant:
+
+    >>> integration.authorParticipant = Author
 
 When the process is created, the author name will be passed in and
 assigned to the workflow-relevant data.  Our author class uses this
@@ -706,15 +721,20 @@ information to select the named user.
 
     >>> class Reviewer(Participant):
     ...     user = reviewer
-    >>> zope.component.provideAdapter(Reviewer, name="Publication.reviewer")
+    >>> integration.reviewerParticipant = Reviewer
 
     >>> class Tech1(Participant):
     ...     user = tech1
-    >>> zope.component.provideAdapter(Tech1, name="Publication.tech1")
+    >>> integration.tech1Participant = Tech1
 
     >>> class Tech2(Participant):
     ...     user = tech2
-    >>> zope.component.provideAdapter(Tech2, name="Publication.tech2")
+    >>> integration.tech2Participant = Tech2
+
+We'll use our orginal participation class for activities without
+performers:
+
+    >>> integration.Participant = Participant
 
 Now we'll create our applications. Let's start with our author:
 
@@ -751,7 +771,7 @@ Now we'll create our applications. Let's start with our author:
     ...         self.activity.process.applicationRelevantData.doc = doc
     ...         super(Prepare, self).finish()
 
-    >>> zope.component.provideAdapter(Prepare, name="Publication.prepare")
+    >>> integration.prepareWorkItem = Prepare
 
 Since we used the prepare application for revisions as well as initial
 preparation, we provide a summary method to show us what we have to do.
@@ -772,8 +792,7 @@ control.
     ...     def finish(self, decision, changes):
     ...         self.activity.workItemFinished(self, decision, changes)
 
-    >>> zope.component.provideAdapter(TechReview,
-    ...                               name="Publication.tech_review")
+    >>> integration.tech_reviewWorkItem = TechReview
 
 Here, we provided a method to access the original document.
 
@@ -793,7 +812,7 @@ Here, we provided a method to access the original document.
     ...     def finish(self, ed_changes):
     ...         self.activity.workItemFinished(self, True, (), ed_changes)
 
-    >>> zope.component.provideAdapter(Review, name="Publication.ed_review")
+    >>> integration.ed_reviewWorkItem = Review
 
 In this implementation, we decided to reject outright if either
 technical editor recommended rejection and to send work back to
@@ -818,7 +837,7 @@ example.
     ...         self.activity.process.applicationRelevantData.doc = doc
     ...         super(Final, self).finish()
 
-    >>> zope.component.provideAdapter(Final, name="Publication.final")
+    >>> integration.finalWorkItem = Final
 
 In our this application, we simply update the document to reflect
 changes.
@@ -828,7 +847,7 @@ changes.
     ...     def finish(self, ed_changes):
     ...         self.activity.workItemFinished(self, ed_changes)
 
-    >>> zope.component.provideAdapter(ReviewFinal, name="Publication.rfinal")
+    >>> integration.rfinalWorkItem = ReviewFinal
 
 Our process now returns data.  When we create a process, we need to
 supply an object that it can call back to:

@@ -68,7 +68,12 @@ def test_multiple_input_parameters():
     ...     def __init__(self, activity):
     ...         self.activity = activity
 
-    >>> component.provideAdapter(Participant, name=".")
+    >>> from zope.wfmc.attributeintegration import AttributeIntegration
+    >>> integration = AttributeIntegration()
+    >>> pd.integration = integration
+
+    >>> integration.Participant = Participant
+
 
     >>> class Eek:
     ...     component.adapts(interfaces.IParticipant)
@@ -80,7 +85,8 @@ def test_multiple_input_parameters():
     ...     def start(self, x, y):
     ...         print x, y
 
-    >>> component.provideAdapter(Eek, name='.eek')
+
+    >>> integration.eekWorkItem = Eek
 
     >>> proc = pd()
     >>> proc.start(99, 42)
@@ -124,7 +130,6 @@ def test_pickling():
 def test_suite():
     from zope.testing import doctest
     suite = unittest.TestSuite()
-    # suite.addTest(doctest.DocTestSuite())
     suite.addTest(doctest.DocFileSuite('README.txt', tearDown=tearDown,
                                        setUp=testing.setUp))
     suite.addTest(doctest.DocFileSuite(

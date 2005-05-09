@@ -32,8 +32,9 @@ class ProcessDefinition:
 
     interface.implements(interfaces.IProcessDefinition)
 
-    def __init__(self, id):
+    def __init__(self, id, integration=None):
         self.id = id
+        self.integration = integration
         self.activities = {}
         self.transitions = []
         self.applications = {}
@@ -215,15 +216,19 @@ class Process(persistent.Persistent):
         zope.event.notify(ProcessStarted(self))
         self.transition(None, (self.startTransition, ))
 
+    def outputs(self):
+        outputs = []
+        for parameter in self.definition.parameters:
+            if parameter.output:
+                outputs.append(
+                    getattr(self.workflowRelevantData,
+                            parameter.__name__))
+        
+        return outputs
+
     def _finish(self):
         if self.context is not None:
-            args = []
-            for parameter in self.definition.parameters:
-                if parameter.output:
-                    args.append(
-                        getattr(self.workflowRelevantData,
-                                parameter.__name__))
-            self.context.processFinished(self, *args)
+            self.context.processFinished(self, *self.outputs())
             
         zope.event.notify(ProcessFinished(self))
         
@@ -293,28 +298,24 @@ class Activity(persistent.Persistent):
         self.process = process
         self.activity_definition_identifier = definition.id
 
+        integration = process.definition.integration
+
         workitems = {}
         if definition.applications:
 
-            performer = component.queryAdapter(
-                self, interfaces.IParticipant,
-                process.process_definition_identifier
-                + '.' + definition.performer)
-
-            if performer is None:
-                performer = component.getAdapter(
-                    self, interfaces.IParticipant,
-                    '.' + definition.performer)
-
+            participant = integration.createParticipant(
+                self, 
+                process.process_definition_identifier,
+                definition.performer,
+                )
+                
             i = 0
             for application, formal, actual in definition.applications:
-                workitem = component.queryAdapter(
-                    performer, interfaces.IWorkItem,
-                    process.process_definition_identifier + '.' + application)
-                if workitem is None:
-                    workitem = component.getAdapter(
-                        performer, interfaces.IWorkItem,
-                        '.' + application)
+                workitem = integration.createWorkItem(
+                    participant, 
+                    process.process_definition_identifier,
+                    application,
+                    )
                 i += 1
                 workitem.id = i
                 workitems[i] = workitem, application, formal, actual

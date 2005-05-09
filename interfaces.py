@@ -18,6 +18,31 @@ $Id$
 
 from zope import interface
 
+class IIntegration(interface.Interface):
+    """Integration of a workflow definition with an application environment
+
+    IIntegration objects provide methods for integratibg workflow
+    process definition with an application environment. 
+    """
+
+    
+    def createParticipant(activity, process_definition_identifier, performer):
+        """Create a participant for an activity
+
+        The process id and especially the perfomer (id) are used to
+        select an appropriate participant type.
+        
+        """
+
+    def createWorkItem(participant,
+                       process_definition_identifier, application):
+        """Create a work for the given participant
+
+        The process id and especially the application (id) are used to
+        select an appropriate work-item type.
+        
+        """
+
 class IProcessDefinition(interface.Interface):
     """Process definition
     """
@@ -27,6 +52,16 @@ class IProcessDefinition(interface.Interface):
     __name__ = interface.Attribute("Name")
 
     description = interface.Attribute("Description")
+
+    integration = interface.Attribute(
+        """Environment-integration component
+
+        The integration component is used to hook up a process
+        definition with an application environment.
+
+        This is an IIntegration.
+        """
+        )
 
     participants = interface.Attribute(
         """Process participants
