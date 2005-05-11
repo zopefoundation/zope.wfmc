@@ -894,9 +894,9 @@ Now we'll do a tech review.  Let's see what tech1 has:
     to save, and faithfully to defend from waste
     the natural resources of my Country.
 
-Let's tell the author to change "dogs" to "men":
+Let's tell the author to change "American" to "Earthling":
 
-    >>> item.finish(True, ['Change "American" to "human"'])
+    >>> item.finish(True, ['Change "American" to "Earthling"'])
     WorkItemFinished('tech_review')
     ActivityFinished(Activity('Publication.tech1'))
     Transition(Activity('Publication.tech1'), Activity('Publication.review'))
@@ -931,10 +931,10 @@ because there were technical comments.  Let's address the comments:
     to save, and faithfully to defend from waste
     the natural resources of my Country.
     Changed we need to make:
-    Change "American" to "human"
+    Change "American" to "Earthling"
     Change "Country" to "planet"
 
-    >>> item.finish("I give my pledge, as an human\n"
+    >>> item.finish("I give my pledge, as an Earthling\n"
     ...             "to save, and faithfully to defend from waste\n"
     ...             "the natural resources of my planet.")
     WorkItemFinished('prepare')
@@ -967,7 +967,7 @@ We'll request an editorial change:
 
     >>> item = reviewer.work_list.pop()
     >>> print item.getDoc()
-    I give my pledge, as an human
+    I give my pledge, as an Earthling
     to save, and faithfully to defend from waste
     the natural resources of my planet.
 
@@ -983,13 +983,13 @@ editing activity, so that the author can make the changes:
     >>> item = authors['bob'].work_list.pop()
     >>> item.summary()
     Previous draft:
-    I give my pledge, as an human
+    I give my pledge, as an Earthling
     to save, and faithfully to defend from waste
     the natural resources of my planet.
     Changed we need to make:
     change "an" to "a"
 
-    >>> item.finish("I give my pledge, as a human\n"
+    >>> item.finish("I give my pledge, as a Earthling\n"
     ...             "to save, and faithfully to defend from waste\n"
     ...             "the natural resources of my planet.")
     WorkItemFinished('final')
@@ -1002,7 +1002,7 @@ review the document and approve it for publication:
 
     >>> item = reviewer.work_list.pop()
     >>> print item.getDoc()
-    I give my pledge, as a human
+    I give my pledge, as a Earthling
     to save, and faithfully to defend from waste
     the natural resources of my planet.
 
