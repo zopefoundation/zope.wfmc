@@ -210,8 +210,8 @@ class Process(persistent.Persistent):
                 arg, args = args[0], args[1:]
                 setattr(data, parameter.__name__, arg)
         if args:
-            raise TypeError("Too many arguments. Expected %s. got %s",
-                            len(process_definition.parameter), len(arguments))
+            raise TypeError("Too many arguments. Expected %s. got %s" %
+                            (len(definition.parameters), len(arguments)))
 
         zope.event.notify(ProcessStarted(self))
         self.transition(None, (self.startTransition, ))
@@ -432,7 +432,7 @@ class ActivityStarted:
     def __repr__(self):
         return "ActivityStarted(%r)" % self.activity
 
-class Parameter:
+class Parameter(object):
 
     interface.implements(interfaces.IParameterDefinition)
 

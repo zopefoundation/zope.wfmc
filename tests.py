@@ -126,6 +126,80 @@ def test_pickling():
 
     """
 
+def test_inputoutput():
+    """
+
+    >>> from zope.wfmc import process
+    >>> pd = process.ProcessDefinition('sample')
+    >>> from zope import component, interface
+    >>> component.provideUtility(pd, name=pd.id)
+
+    >>> pd.defineParameters(
+    ...     process.InputParameter('x'),
+    ...     )
+
+    >>> pd.defineActivities(
+    ...    eek = process.ActivityDefinition(),
+    ...    ook = process.ActivityDefinition(),
+    ...    )
+
+    >>> pd.defineTransitions(process.TransitionDefinition('eek', 'ook'))
+
+    >>> pd.defineApplications(
+    ...     eek = process.Application(
+    ...         process.InputOutputParameter('x'),
+    ...         )
+    ...     )
+
+    >>> pd.activities['eek'].addApplication('eek', ['x'])
+
+    >>> class Participant(object):
+    ...     def __init__(self, activity):
+    ...         self.activity = activity
+
+    >>> from zope.wfmc.attributeintegration import AttributeIntegration
+    >>> integration = AttributeIntegration()
+    >>> pd.integration = integration
+
+    >>> integration.Participant = Participant
+
+    >>> class Eek:
+    ...     def __init__(self, participant):
+    ...         self.participant = participant
+    ...
+    ...     def start(self, x):
+    ...         self.participant.activity.workItemFinished(self, x+1)
+
+
+    >>> integration.eekWorkItem = Eek
+
+    >>> proc = pd()
+    >>> proc.start(1)
+    >>> proc.workflowRelevantData.x
+    2
+    
+    """
+def test_wrong_number_process_args_error_message():
+    """
+
+    >>> from zope.wfmc import process
+    >>> pd = process.ProcessDefinition('sample')
+    >>> from zope import component, interface
+    >>> component.provideUtility(pd, name=pd.id)
+    >>> pd.defineActivities(
+    ...    eek = process.ActivityDefinition(),
+    ...    ook = process.ActivityDefinition(),
+    ...    )
+    >>> pd.defineTransitions(process.TransitionDefinition('eek', 'ook'))
+
+    >>> proc = pd()
+    >>> proc.start(1)
+    Traceback (most recent call last):
+    ...
+    TypeError: Too many arguments. Expected 0. got 1
+    
+    """
+    
 
 def test_suite():
     from zope.testing import doctest
