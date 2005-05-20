@@ -16,8 +16,6 @@
 $Id$
 """
 
-import sets
-
 import persistent
 
 import zope.cachedescriptors.property
