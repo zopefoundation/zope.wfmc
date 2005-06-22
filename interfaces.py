@@ -15,13 +15,14 @@
 
 $Id$
 """
+__docformat__ = "reStructuredText"
 
 from zope import interface
 
 class IIntegration(interface.Interface):
     """Integration of a workflow definition with an application environment
 
-    IIntegration objects provide methods for integratibg workflow
+    ``IIntegration`` objects provide methods for integrating workflow
     process definition with an application environment. 
     """
 
@@ -31,20 +32,21 @@ class IIntegration(interface.Interface):
 
         The process id and especially the perfomer (id) are used to
         select an appropriate participant type.
-        
         """
 
     def createWorkItem(participant,
                        process_definition_identifier, application):
-        """Create a work for the given participant
+        """Create a work item for the given participant
 
         The process id and especially the application (id) are used to
         select an appropriate work-item type.
-        
         """
 
 class IProcessDefinition(interface.Interface):
     """Process definition
+
+    A process definition defines a particular workflow and define the control
+    and flow of the work. You can think of them as the workflow blueprint.
     """
 
     id = interface.Attribute("Process-definition identifier")
@@ -59,7 +61,7 @@ class IProcessDefinition(interface.Interface):
         The integration component is used to hook up a process
         definition with an application environment.
 
-        This is an IIntegration.
+        This is an ``IIntegration``.
         """
         )
 
@@ -163,7 +165,7 @@ class IActivityDefinition(interface.Interface):
         """
 
 class ITransitionDefinition(interface.Interface):
-    """Activity definition
+    """Transition definition
     """
 
 class IProcess(interface.Interface):
