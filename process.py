@@ -87,8 +87,7 @@ class ProcessDefinition:
                 start += ((aid, activity), )
                 if not activity.outgoing:
                     raise interfaces.InvalidProcessDefinition(
-                        "Activity %s has no transitions",
-                        aid)
+                        "Activity %s has no transitions" %aid)
 
         if len(start) != 1:
             if start:
