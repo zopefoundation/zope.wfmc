@@ -335,8 +335,9 @@ class Activity(persistent.Persistent):
         if definition.andJoinSetting:
             if transition in self.incoming:
                 raise interfaces.ProcessError(
-                    "Repeated incoming transition while waiting for and "
-                    "completion")
+                    "Repeated incoming %s with id='%s' "
+                    "while waiting for and completion"
+                    %(transition, transition.id))
             self.incoming += (transition, )
 
             if len(self.incoming) < len(definition.incoming):
