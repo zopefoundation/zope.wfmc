@@ -138,7 +138,7 @@ class ActivityDefinition:
         if len(formal) != len(actual):
             raise TypeError("Wrong number of parameters => "
                             "Actual=%s, Formal=%s for Application %s with id=%s"
-                            %(str(actual), str(formal), str(app), str(app.id)))
+                            %(actual, formal, app, app.id))
         self.applications += ((application, formal, tuple(actual)), ) 
 
     def definePerformer(self, performer):
