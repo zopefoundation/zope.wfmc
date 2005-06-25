@@ -133,11 +133,13 @@ class ActivityDefinition:
         self.andJoinSetting = setting
 
     def addApplication(self, application, actual=()):
-        formal = self.process.applications[application].parameters
+        app = self.process.applications[application]
+        formal = app.parameters
         if len(formal) != len(actual):
-            raise TypeError("Wrong number of parameters")
-        
-        self.applications += ((application, formal, tuple(actual)), )
+            raise TypeError("Wrong number of parameters => "
+                            "Actual=%s, Formal=%s for Application %s with id=%s"
+                            %(str(actual), str(formal), str(app), str(app.id)))
+        self.applications += ((application, formal, tuple(actual)), ) 
 
     def definePerformer(self, performer):
         self.performer = performer
