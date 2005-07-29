@@ -267,8 +267,8 @@ class TextCondition:
         return {'source': self.source}
 
     def __call__(self, data):
-        # XXX we *depend* on being able to use the data's dict.
-        # This needs to be part of the contract.
+        # We *depend* on being able to use the data's dict.
+        # TODO This needs to be part of the contract.
         try:
             compiled = self._v_compiled
         except AttributeError:
