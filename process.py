@@ -164,7 +164,7 @@ class ActivityDefinition:
             self.outgoing = self.transition_outgoing
 
     def __repr__(self):
-        return "<ActivityDefinition '%s'>" %self.__name__
+        return "<ActivityDefinition '%r'>" %self.__name__
 
         
 def always_true(data):
@@ -181,7 +181,7 @@ class TransitionDefinition:
         self.condition = condition
 
     def __repr__(self):
-        return "TransitionDefinition(from='%s', to='%s')" %(self.from_, self.to)
+        return "TransitionDefinition(from='%r', to='%r')" %(self.from_, self.to)
 
         
 class Process(persistent.Persistent):
@@ -471,11 +471,11 @@ class Application:
         self.parameters += parameters
 
     def __repr__(self):
-        input = ', '.join([param.__name__ for param in self.parameters
+        input = u', '.join([param.__name__ for param in self.parameters
                            if param.input == True])
-        output = ', '.join([param.__name__ for param in self.parameters
+        output = u', '.join([param.__name__ for param in self.parameters
                            if param.output == True])        
-        return "<Application '%s': (%s) --> (%s)>" %(self.__name__,
+        return "<Application '%r': (%r) --> (%r)>" %(self.__name__,
                                                      input, output)
         
 
@@ -487,4 +487,4 @@ class Participant:
         self.__name__ = name
 
     def __repr__(self):
-        return "Participant('%s')" %self.__name__
+        return "Participant('%r')" %self.__name__
