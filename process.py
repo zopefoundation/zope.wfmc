@@ -475,7 +475,7 @@ class Application:
                            if param.input == True])
         output = u', '.join([param.__name__ for param in self.parameters
                            if param.output == True])        
-        return "<Application %r: (%r) --> (%r)>" %(self.__name__, input, output)
+        return "<Application %r: (%s) --> (%s)>" %(self.__name__, input, output)
         
 
 class Participant:
