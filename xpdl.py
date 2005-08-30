@@ -76,9 +76,8 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
             try:
                 result = handler(self, attrs)
             except:
-                raise HandlerError, (
-                    sys.exc_info()[1], name[1], self.locator
-                    ), sys.exc_info()[2]
+                raise HandlerError(sys.exc_info()[1], name[1], self.locator
+                    ), None, sys.exc_info()[2]
         else:
             result = None
 
@@ -96,9 +95,8 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
             try:
                 handler(self, last)
             except:
-                raise HandlerError, (
-                    sys.exc_info()[1], name[1], self.locator
-                    ), sys.exc_info()[2]
+                raise HandlerError(sys.exc_info()[1], name[1], self.locator
+                    ), None, sys.exc_info()[2]
 
         self.text = u''
 
