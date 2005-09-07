@@ -26,7 +26,7 @@ import zope.event
 
 from zope.wfmc import interfaces
 
-class ProcessDefinition:
+class ProcessDefinition(object):
 
     interface.implements(interfaces.IProcessDefinition)
 
@@ -112,7 +112,7 @@ class ProcessDefinition:
         except AttributeError:
             pass
 
-class ActivityDefinition:
+class ActivityDefinition(object):
 
     interface.implements(interfaces.IActivityDefinition)
 
@@ -170,7 +170,7 @@ class ActivityDefinition:
 def always_true(data):
     return True
 
-class TransitionDefinition:
+class TransitionDefinition(object):
 
     interface.implements(interfaces.ITransitionDefinition)
 
