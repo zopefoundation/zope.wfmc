@@ -270,7 +270,7 @@ class InvalidProcessDefinition(Exception):
     """
 
 class ProcessError(Exception):
-    """An error occured in execution of a process
+    """An error occurred in execution of a process.
     """
 
 class IProcessStarted(interface.Interface):
