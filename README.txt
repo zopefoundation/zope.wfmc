@@ -93,7 +93,7 @@ activity completed immediately.
 
 Note that we didn't transition into the rejected activity.  By
 default, when an activity is completed, the first transition for which
-it's condition evaluates to `True` is used.  By default, transitions
+its condition evaluates to `True` is used.  By default, transitions
 have boolean conditions [1]_ that evaluate to `True`, so the transition
 to `publish` is used because it was defined before the transition to
 `reject`.  What we want is to transition to `publish` if a reviewer
@@ -190,22 +190,22 @@ Application Integration
 -----------------------
 
 To use a process definition to control application logic, we need to
-associate it with an "integration" object. 
+associate it with an "integration" object.
 
 When a process needs to get a participant, it calls createParticipant
-on it's integration attribute, passing the process id and the
+on its integration attribute, passing the process id and the
 performer id. If an activity doesn't have a
-performer, then procedure above is used with an empty performer id.
+performer, then the procedure above is used with an empty performer id.
 
 Similarly, when a process needs a work item, it calls createWorkItem
-on it's integration attribute, passing the process id and the
+on its integration attribute, passing the process id and the
 application id.
 
 Work items provide a `start` method, which is used to start the work
 and pass input arguments.  It is the responsibility of the work item,
-at some later time, to call the `workitemFinished` method on the
+at some later time, to call the `workItemFinished` method on the
 activity, to notify the activity that the work item was
-completed. Output parameters are passed to the `workitemFinished`
+completed. Output parameters are passed to the `workItemFinished`
 method.
 
 A simple way to create integration objects is with
@@ -279,7 +279,7 @@ and then we'll hook them up with the integration object:
 Using workflow processes
 ------------------------
 
-To use a process definition, instantiate it and call it's start method
+To use a process definition, instantiate it and call its start method
 to start execution:
 
     >>> proc = pd()
@@ -296,7 +296,7 @@ get the item from the list.
 
     >>> item = work_list.pop()
 
-Now we can finish the work item, by calling it's finish method:
+Now we can finish the work item, by calling its finish method:
 
     >>> item.finish()
     WorkItemFinished('author')
