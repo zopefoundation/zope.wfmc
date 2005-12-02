@@ -23,14 +23,14 @@ class IIntegration(interface.Interface):
     """Integration of a workflow definition with an application environment
 
     ``IIntegration`` objects provide methods for integrating workflow
-    process definition with an application environment. 
+    process definition with an application environment.
     """
 
-    
+
     def createParticipant(activity, process_definition_identifier, performer):
         """Create a participant for an activity
 
-        The process id and especially the perfomer (id) are used to
+        The process id and especially the performer (id) are used to
         select an appropriate participant type.
         """
 
@@ -92,7 +92,7 @@ class IProcessDefinition(interface.Interface):
         Activity definitions are supplied as keyword arguments.  The
         keywords provide activity identifiers.  The values are
         IActivityDefinition objects.
-        
+
         """
 
     def defineTransitions(*transitions):
@@ -122,10 +122,10 @@ class IProcessDefinition(interface.Interface):
     def defineParameters(*parameters):
         """Declate process parameters
 
-        Input parameters are set as workflow-relevent data.  Output
+        Input parameters are set as workflow-relevant data.  Output
         parameters are passed from workflow-relevant data to the
         processFinished method of process-instances process contexts.
-        
+
         """
 
 class IActivityDefinition(interface.Interface):
@@ -138,7 +138,7 @@ class IActivityDefinition(interface.Interface):
         """Declare that the activity uses the identified activity
 
         The application identifier must match an application declared
-        for the process.  
+        for the process.
 
         Parameter definitions can be given as positional arguments.
         The parameter definition directions must match those given in
@@ -187,16 +187,16 @@ class IProcess(interface.Interface):
 
         Object with attributes containing data used to pass data as
         shared data for applications
-        
+
         """
         )
 
 class IProcessContext(interface.Interface):
-    """Object that can recieve process results.
+    """Object that can receive process results.
     """
 
     def processFinished(process, *results):
-        """Recieve notification of process completion, with results
+        """Receive notification of process completion, with results
         """
 
 class IActivity(interface.Interface):
@@ -259,7 +259,7 @@ class IWorkItem(interface.Interface):
         This identifier is set by the activity instance
 
         """)
- 
+
     def start(*arguments):
         """Start the work
         """

@@ -70,9 +70,9 @@ fails, we look for an adapter consisting of a dot followed by the
 application id.  Workflow items provide a `start` method, which is
 used to start the work and pass input arguments.  It is the
 responsibility of the work item, at some later time, to call the
-`workitemFinished` method on the activity, to notify the activity that
+`workItemFinished` method on the activity, to notify the activity that
 the work item was completed. Output parameters are passed to the
-`workitemFinished` method.
+`workItemFinished` method.
 
 Let's implement participants for our process. We'll start with a
 generic participant:
