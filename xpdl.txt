@@ -4,7 +4,7 @@ XPDL Import
 We can import process definitions from files in the XML Process
 Definition Language (XPDL) format. An XPDL file contains multiple
 process definitions arranged in a package. When we load the file, we
-get a package containing some numner of process definitions.
+get a package containing some number of process definitions.
 
 Let's look at an example.  The file `publication.xpdl`
 contains a definition for the publication example developed in the
