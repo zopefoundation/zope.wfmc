@@ -39,10 +39,6 @@ and we'll register the process definition as a utility:
 
     >>> import zope.component
     >>> zope.component.provideUtility(pd, name=pd.id)
-    ... # doctest: +NORMALIZE_WHITESPACE
-    Registered event:
-    UtilityRegistration(<BaseGlobalComponents base>,
-                        IProcessDefinition, u'Publication', Publication, u'')
 
 and we'll define and register participant and application adapters:
 

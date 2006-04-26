@@ -102,10 +102,6 @@ rejects the content for publication.  We can use a condition for this:
 
     >>> pd = process.ProcessDefinition('sample')
     >>> zope.component.provideUtility(pd, name=pd.id)
-    ... # doctest: +NORMALIZE_WHITESPACE
-    Registered event:
-    UtilityRegistration(<BaseGlobalComponents base>,
-               IProcessDefinition, 'sample', ProcessDefinition('sample'), u'')
 
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
@@ -341,10 +337,6 @@ example by passing it to the definition constructor:
 
     >>> pd = process.ProcessDefinition('sample', integration)
     >>> zope.component.provideUtility(pd, name=pd.id)
-    ... # doctest: +NORMALIZE_WHITESPACE
-    Registered event:
-    UtilityRegistration(<BaseGlobalComponents base>,
-               IProcessDefinition, 'sample', ProcessDefinition('sample'), u'')
 
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
@@ -418,11 +410,6 @@ redefine the process:
 
     >>> pd = process.ProcessDefinition('sample', integration)
     >>> zope.component.provideUtility(pd, name=pd.id)
-    ... # doctest: +NORMALIZE_WHITESPACE
-    Registered event:
-    UtilityRegistration(<BaseGlobalComponents base>,
-             IProcessDefinition, 'sample', ProcessDefinition('sample'), u'')
-
 
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
@@ -582,10 +569,6 @@ integration object:
     >>> Publication = process.ProcessDefinition('Publication')
     >>> Publication.integration = integration
     >>> zope.component.provideUtility(Publication, name=Publication.id)
-    ... # doctest: +NORMALIZE_WHITESPACE
-    Registered event:
-    UtilityRegistration(<BaseGlobalComponents base>,
-      IProcessDefinition, 'Publication', ProcessDefinition('Publication'), u'')
 
     >>> Publication.defineActivities(
     ...     start   = process.ActivityDefinition("Start"),
