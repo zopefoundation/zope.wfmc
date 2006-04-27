@@ -102,6 +102,7 @@ rejects the content for publication.  We can use a condition for this:
 
     >>> pd = process.ProcessDefinition('sample')
     >>> zope.component.provideUtility(pd, name=pd.id)
+
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
     ...     review = process.ActivityDefinition(),
@@ -336,6 +337,7 @@ example by passing it to the definition constructor:
 
     >>> pd = process.ProcessDefinition('sample', integration)
     >>> zope.component.provideUtility(pd, name=pd.id)
+
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
     ...     review = process.ActivityDefinition(),
@@ -408,6 +410,7 @@ redefine the process:
 
     >>> pd = process.ProcessDefinition('sample', integration)
     >>> zope.component.provideUtility(pd, name=pd.id)
+
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
     ...     review = process.ActivityDefinition(),
