@@ -26,9 +26,28 @@ import zope.event
 
 from zope.wfmc import interfaces
 
+def always_true(data):
+    return True
+
+class TransitionDefinition(object):
+
+    interface.implements(interfaces.ITransitionDefinition)
+
+    def __init__(self, from_, to, condition=always_true, id=None):
+        self.id = id
+        self.from_ = from_
+        self.to = to
+        self.condition = condition
+
+    def __repr__(self):
+        return "TransitionDefinition(from=%r, to=%r)" %(self.from_, self.to)
+
+
 class ProcessDefinition(object):
 
     interface.implements(interfaces.IProcessDefinition)
+    
+    TransitionDefinitionFactory = TransitionDefinition
 
     def __init__(self, id, integration=None):
         self.id = id
@@ -99,7 +118,7 @@ class ProcessDefinition(object):
                 raise interfaces.InvalidProcessDefinition(
                     "No start activities")
 
-        return TransitionDefinition(None, start[0][0])
+        return self.TransitionDefinitionFactory(None, start[0][0])
 
     _start = zope.cachedescriptors.property.Lazy(_start)
 
@@ -165,23 +184,6 @@ class ActivityDefinition(object):
 
     def __repr__(self):
         return "<ActivityDefinition %r>" %self.__name__
-
-
-def always_true(data):
-    return True
-
-class TransitionDefinition(object):
-
-    interface.implements(interfaces.ITransitionDefinition)
-
-    def __init__(self, from_, to, condition=always_true, id=None):
-        self.id = id
-        self.from_ = from_
-        self.to = to
-        self.condition = condition
-
-    def __repr__(self):
-        return "TransitionDefinition(from=%r, to=%r)" %(self.from_, self.to)
 
 
 class Process(persistent.Persistent):

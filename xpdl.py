@@ -65,6 +65,12 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
     start_handlers = {}
     end_handlers = {}
     text = u''
+    
+    ProcessDefinitionFactory = zope.wfmc.process.ProcessDefinition
+    ParticipantFactory = zope.wfmc.process.Participant
+    ApplicationFactory = zope.wfmc.process.Application
+    ActivityDefinitionFactory = zope.wfmc.process.ActivityDefinition
+    TransitionDefinitionFactory = zope.wfmc.process.TransitionDefinition
 
     def __init__(self, package):
         self.package = package
@@ -120,7 +126,7 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
 
     def WorkflowProcess(self, attrs):
         id = attrs[(None, 'Id')]
-        process = zope.wfmc.process.ProcessDefinition(id)
+        process = self.ProcessDefinitionFactory(id)
         process.__name__ = attrs.get((None, 'Name'))
 
         # Copy package data:
@@ -147,14 +153,14 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
     def Participant(self, attrs):
         id = attrs[(None, 'Id')]
         name = attrs.get((None, 'Name'))
-        participant = zope.wfmc.process.Participant(name)
+        participant = self.ParticipantFactory(name)
         self.stack[-1].defineParticipants(**{str(id): participant})
     start_handlers[(xpdlns, 'Participant')] = Participant
 
     def Application(self, attrs):
         id = attrs[(None, 'Id')]
         name = attrs.get((None, 'Name'))
-        app = zope.wfmc.process.Application()
+        app = self.ApplicationFactory()
         app.id = id
         if name:
             app.__name__ = name
@@ -180,7 +186,7 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
     def Activity(self, attrs):
         id = attrs[(None, 'Id')]
         name = attrs.get((None, 'Name'))
-        activity = zope.wfmc.process.ActivityDefinition(name)
+        activity = self.ActivityDefinitionFactory(name)
         activity.id = id
         self.stack[-1].defineActivities(**{str(id): activity})
         return activity
@@ -228,7 +234,7 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
         name = attrs.get((None, 'Name'))
         from_ = attrs.get((None, 'From'))
         to = attrs.get((None, 'To'))
-        transition = zope.wfmc.process.TransitionDefinition(from_, to)
+        transition = self.TransitionDefinitionFactory(from_, to)
         transition.id = id
         return transition
     start_handlers[(xpdlns, 'Transition')] = Transition
@@ -239,7 +245,7 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
     
     def condition(self, ignored):
         assert isinstance(self.stack[-1],
-                          zope.wfmc.process.TransitionDefinition)
+                          self.TransitionDefinitionFactory)
 
         text = self.text
         self.stack[-1].condition = TextCondition("(%s)" % text)
