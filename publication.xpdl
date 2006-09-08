@@ -29,6 +29,7 @@
         <WorkflowProcess AccessLevel="PUBLIC" Id="Publication" Name="Publication">
             <ProcessHeader DurationUnit="D">
                 <Created>2005-01-06 16:29:02</Created>
+                <Description>This is the sample process</Description>
             </ProcessHeader>
             <RedefinableHeader PublicationStatus="UNDER_TEST"/>
             <FormalParameters>
@@ -86,6 +87,7 @@
                 </Participant>
                 <Participant Id="tech1" Name="Technical Reviewer 1">
                     <ParticipantType Type="HUMAN"/>
+                    <Description>He is a smart guy.</Description>
                 </Participant>
                 <Participant Id="tech2" Name="Technical Reviewer 2">
                     <ParticipantType Type="HUMAN"/>
@@ -192,6 +194,7 @@
                     </ExtendedAttributes>
                 </Activity>
                 <Activity Id="tech1" Name="Technical Review 1">
+                    <Description>This is the first Technical Review.</Description>
                     <Implementation>
                         <Tool Id="tech_review" Type="APPLICATION">
                             <ActualParameters>
@@ -386,13 +389,13 @@
                 </Activity>
             </Activities>
             <Transitions>
-                <Transition From="prepare" Id="Publication_Tra2" Name="Transition" To="tech1">
+                <Transition From="prepare" Id="Publication_Tra2" Name="Transition to Tech Review 1" To="tech1">
                     <ExtendedAttributes>
                         <ExtendedAttribute Name="RoutingType" Value="NOROUTING"/>
                         <ExtendedAttribute Name="BreakPoint" Value="160;160;1"/>
                     </ExtendedAttributes>
                 </Transition>
-                <Transition From="prepare" Id="Publication_Tra3" Name="Transition" To="tech2">
+                <Transition From="prepare" Id="Publication_Tra3" Name="Transition to Tech Review 2" To="tech2">
                     <ExtendedAttributes>
                         <ExtendedAttribute Name="RoutingType" Value="NOROUTING"/>
                         <ExtendedAttribute Name="BreakPoint" Value="210;290;1"/>
@@ -421,6 +424,7 @@
                 </Transition>
                 <Transition From="review" Id="Publication_Tra8" Name="Transition" To="final">
                     <Condition Type="CONDITION">ed_changes</Condition>
+                    <Description>Use this transition if there are editorial changes required.</Description>
                     <ExtendedAttributes>
                         <ExtendedAttribute Name="RoutingType" Value="NOROUTING"/>
                     </ExtendedAttributes>
@@ -462,6 +466,6 @@
     </WorkflowProcesses>
     <ExtendedAttributes>
         <ExtendedAttribute Name="MadeBy" Value="JaWE"/>
-        <ExtendedAttribute Name="Version" Value="1.2"/>
+        <ExtendedAttribute Name="Version" Value="1.4.2"/>
     </ExtendedAttributes>
 </Package>

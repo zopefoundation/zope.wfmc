@@ -33,11 +33,13 @@ class TransitionDefinition(object):
 
     interface.implements(interfaces.ITransitionDefinition)
 
-    def __init__(self, from_, to, condition=always_true, id=None):
+    def __init__(self, from_, to, condition=always_true, id=None, __name__=None):
         self.id = id
         self.from_ = from_
         self.to = to
         self.condition = condition
+        self.__name__ = __name__
+        self.description = None
 
     def __repr__(self):
         return "TransitionDefinition(from=%r, to=%r)" %(self.from_, self.to)
@@ -57,6 +59,7 @@ class ProcessDefinition(object):
         self.applications = {}
         self.participants = {}
         self.parameters = ()
+        self.description = None
 
     def __repr__(self):
         return "ProcessDefinition(%r)" % self.id
@@ -144,6 +147,7 @@ class ActivityDefinition(object):
         self.transition_outgoing = self.explicit_outgoing = ()
         self.applications = ()
         self.andJoinSetting = self.andSplitSetting = False
+        self.description = None
 
     def andSplit(self, setting):
         self.andSplitSetting = setting
@@ -486,6 +490,7 @@ class Participant:
 
     def __init__(self, name=None):
         self.__name__ = name
+        self.description = None
 
     def __repr__(self):
         return "Participant(%r)" %self.__name__

@@ -133,6 +133,10 @@ class IActivityDefinition(interface.Interface):
     """
 
     id = interface.Attribute("Activity identifier")
+    
+    __name__ = interface.Attribute("Activity Name")
+    
+    description = interface.Attribute("Description")
 
     def addApplication(id, *parameters):
         """Declare that the activity uses the identified activity
@@ -167,6 +171,21 @@ class IActivityDefinition(interface.Interface):
 class ITransitionDefinition(interface.Interface):
     """Transition definition
     """
+    id = interface.Attribute("Transition identifier")
+    
+    __name__ = interface.Attribute(
+        "Transition name, Text used to identify the Transition.")
+    
+    description = interface.Attribute("Description")
+    
+    from_ = interface.Attribute(
+        "Determines the FROM source of a Transition. (Activity Identifier)")
+    
+    to = interface.Attribute(
+        "Determines the TO target of a Transition (Activity Identifier)")
+    
+    condition = interface.Attribute(
+        "A Transition condition expression based on relevant data field.")
 
 class IProcess(interface.Interface):
     """Process instance

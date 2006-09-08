@@ -155,6 +155,7 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
         name = attrs.get((None, 'Name'))
         participant = self.ParticipantFactory(name)
         self.stack[-1].defineParticipants(**{str(id): participant})
+        return participant
     start_handlers[(xpdlns, 'Participant')] = Participant
 
     def Application(self, attrs):
@@ -236,6 +237,7 @@ class XPDLHandler(xml.sax.handler.ContentHandler):
         to = attrs.get((None, 'To'))
         transition = self.TransitionDefinitionFactory(from_, to)
         transition.id = id
+        transition.__name__ = name
         return transition
     start_handlers[(xpdlns, 'Transition')] = Transition
     

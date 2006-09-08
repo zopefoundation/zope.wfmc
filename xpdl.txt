@@ -352,7 +352,13 @@ Descriptions
 ============
 
 Most process elements can have names and descriptions.
-
+    
+    >>> pd.__name__
+    u'Publication'
+    
+    >>> pd.description
+    u'This is the sample process'
+    
     >>> pd.applications['prepare'].__name__
     u'Prepare'
 
@@ -362,5 +368,21 @@ Most process elements can have names and descriptions.
     >>> pd.activities['tech1'].__name__
     u'Technical Review 1'
     
+    >>> pd.activities['tech1'].description
+    u'This is the first Technical Review.'
+    
     >>> pd.participants['tech1'].__name__
     u'Technical Reviewer 1'
+    
+    >>> pd.participants['tech1'].description
+    u'He is a smart guy.'
+    
+    >>> sorted([item.__name__ for item in pd.transitions])
+        [u'Transition', u'Transition', u'Transition', u'Transition',
+        u'Transition', u'Transition', u'Transition', u'Transition',
+        u'Transition', u'Transition', u'Transition to Tech Review 1',
+        u'Transition to Tech Review 2']
+    
+    >>> sorted([item.description for item in pd.transitions])
+        [None, None, None, None, None, None, None, None, None, None, None,
+        u'Use this transition if there are editorial changes required.']
