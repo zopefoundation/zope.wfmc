@@ -477,6 +477,33 @@ expected:
     ProcessFinished(Process('sample'))
 
 
+Let's see the other way also, where we should transition to reject:
+
+
+    >>> proc = pd()
+    >>> proc.start()
+    ... # doctest: +NORMALIZE_WHITESPACE
+    ProcessStarted(Process('sample'))
+    Transition(None, Activity('sample.author'))
+    ActivityStarted(Activity('sample.author'))
+
+    >>> work_list.pop().finish()
+    WorkItemFinished('author')
+    ActivityFinished(Activity('sample.author'))
+    Transition(Activity('sample.author'), Activity('sample.review'))
+    ActivityStarted(Activity('sample.review'))
+
+    >>> work_list.pop().finish(False)
+    WorkItemFinished('review')
+    ActivityFinished(Activity('sample.review'))
+    Transition(Activity('sample.review'), Activity('sample.reject'))
+    ActivityStarted(Activity('sample.reject'))
+    Rejected
+    WorkItemFinished('reject')
+    ActivityFinished(Activity('sample.reject'))
+    ProcessFinished(Process('sample'))
+
+
 Complex Flows
 -------------
 
@@ -712,6 +739,7 @@ them. Finally, we'll create multiple authors and use the selected one:
     ...     def __init__(self, activity):
     ...         Participant.__init__(self, activity)
     ...         author_name = activity.process.workflowRelevantData.author
+    ...         print "Author `%s` selected" % author_name
     ...         self.user = authors[author_name]
 
 In this example, we need to define a separate attribute for each participant:
@@ -764,7 +792,7 @@ Now we'll create our applications. Let's start with our author:
     ...         if doc:
     ...             print 'Previous draft:'
     ...             print doc
-    ...             print 'Changed we need to make:'
+    ...             print 'Changes we need to make:'
     ...             for change in process.workflowRelevantData.tech_changes:
     ...                 print change
     ...         else:
@@ -820,7 +848,7 @@ Here, we provided a method to access the original document.
 In this implementation, we decided to reject outright if either
 technical editor recommended rejection and to send work back to
 preparation if there are any technical changes. We also subclassed
-`TechEdit` to get the `getDoc` method.
+`TechReview` to get the `getDoc` method.
 
 We'll reuse the `publish` and `reject` application from the previous
 example.
@@ -832,7 +860,7 @@ example.
     ...         doc = getattr(process.applicationRelevantData, 'doc', '')
     ...         print 'Previous draft:'
     ...         print self.activity.process.applicationRelevantData.doc
-    ...         print 'Changed we need to make:'
+    ...         print 'Changes we need to make:'
     ...         for change in process.workflowRelevantData.ed_changes:
     ...            print change
     ...
@@ -870,6 +898,7 @@ Now, let's try out our process:
     Transition(None, Activity('Publication.start'))
     ActivityStarted(Activity('Publication.start'))
     ActivityFinished(Activity('Publication.start'))
+    Author `bob` selected
     Transition(Activity('Publication.start'), Activity('Publication.prepare'))
     ActivityStarted(Activity('Publication.prepare'))
 
@@ -919,13 +948,15 @@ Now we'll do the other technical review:
     ActivityStarted(Activity('Publication.review'))
     WorkItemFinished('ed_review')
     ActivityFinished(Activity('Publication.review'))
+    Author `bob` selected
     Transition(Activity('Publication.review'), Activity('Publication.prepare'))
     ActivityStarted(Activity('Publication.prepare'))
 
 Now when we transitioned to the editorial review activity, we started
 it, because each of the input transitions had happened.  Our editorial
 review application automatically sent the work back to preparation,
-because there were technical comments.  Let's address the comments:
+because there were technical comments. Of course the author is still `bob`.
+Let's address the comments:
 
     >>> item = authors['bob'].work_list.pop()
     >>> item.summary()
@@ -933,7 +964,7 @@ because there were technical comments.  Let's address the comments:
     I give my pledge, as an American
     to save, and faithfully to defend from waste
     the natural resources of my Country.
-    Changed we need to make:
+    Changes we need to make:
     Change "American" to "Earthling"
     Change "Country" to "planet"
 
@@ -977,11 +1008,12 @@ We'll request an editorial change:
     >>> item.finish(['change "an" to "a"'])
     WorkItemFinished('ed_review')
     ActivityFinished(Activity('Publication.review'))
+    Author `bob` selected
     Transition(Activity('Publication.review'), Activity('Publication.final'))
     ActivityStarted(Activity('Publication.final'))
 
 Because we requested editorial changes, we transitioned to the final
-editing activity, so that the author can make the changes:
+editing activity, so that the author (still bob) can make the changes:
 
     >>> item = authors['bob'].work_list.pop()
     >>> item.summary()
@@ -989,7 +1021,7 @@ editing activity, so that the author can make the changes:
     I give my pledge, as an Earthling
     to save, and faithfully to defend from waste
     the natural resources of my planet.
-    Changed we need to make:
+    Changes we need to make:
     change "an" to "a"
 
     >>> item.finish("I give my pledge, as a Earthling\n"
@@ -1037,3 +1069,8 @@ Coming Soon
 
 .. [1] There are other kinds of conditions, namely "otherwise" and
        "exception" conditions.
+
+See also
+---------
+http://www.wfmc.org
+http://www.wfmc.org/standards/standards.htm

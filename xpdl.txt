@@ -66,6 +66,7 @@ and we'll define and register participant and application adapters:
     ...     def __init__(self, activity):
     ...         Participant.__init__(self, activity)
     ...         author_name = activity.process.workflowRelevantData.author
+    ...         print "Author `%s` selected" % author_name
     ...         self.user = authors[author_name]
 
     >>> integration.authorParticipant = Author
@@ -107,7 +108,7 @@ and we'll define and register participant and application adapters:
     ...         if doc:
     ...             print 'Previous draft:'
     ...             print doc
-    ...             print 'Changed we need to make:'
+    ...             print 'Changes we need to make:'
     ...             for change in process.workflowRelevantData.tech_changes:
     ...                 print change
     ...         else:
@@ -154,7 +155,7 @@ and we'll define and register participant and application adapters:
     ...         doc = getattr(process.applicationRelevantData, 'doc', '')
     ...         print 'Previous draft:'
     ...         print self.activity.process.applicationRelevantData.doc
-    ...         print 'Changed we need to make:'
+    ...         print 'Changes we need to make:'
     ...         for change in process.workflowRelevantData.ed_changes:
     ...            print change
     ...
@@ -214,6 +215,7 @@ Now, let's try out our process.  We'll follow the same steps we did in
     Transition(None, Activity(u'Publication.start'))
     ActivityStarted(Activity(u'Publication.start'))
     ActivityFinished(Activity(u'Publication.start'))
+    Author `bob` selected
     Transition(Activity(u'Publication.start'), 
                Activity(u'Publication.prepare'))
     ActivityStarted(Activity(u'Publication.prepare'))
@@ -252,6 +254,7 @@ Now, let's try out our process.  We'll follow the same steps we did in
     ActivityStarted(Activity(u'Publication.review'))
     WorkItemFinished(u'ed_review')
     ActivityFinished(Activity(u'Publication.review'))
+    Author `bob` selected
     Transition(Activity(u'Publication.review'), 
                Activity(u'Publication.prepare'))
     ActivityStarted(Activity(u'Publication.prepare'))
@@ -262,7 +265,7 @@ Now, let's try out our process.  We'll follow the same steps we did in
     I give my pledge, as an American
     to save, and faithfully to defend from waste
     the natural resources of my Country.
-    Changed we need to make:
+    Changes we need to make:
     Change "American" to "human"
     Change "Country" to "planet"
 
@@ -302,6 +305,7 @@ Now, let's try out our process.  We'll follow the same steps we did in
     >>> item.finish(['change "an" to "a"'])
     WorkItemFinished(u'ed_review')
     ActivityFinished(Activity(u'Publication.review'))
+    Author `bob` selected
     Transition(Activity(u'Publication.review'),
                Activity(u'Publication.final'))
     ActivityStarted(Activity(u'Publication.final'))
@@ -312,7 +316,7 @@ Now, let's try out our process.  We'll follow the same steps we did in
     I give my pledge, as an human
     to save, and faithfully to defend from waste
     the natural resources of my planet.
-    Changed we need to make:
+    Changes we need to make:
     change "an" to "a"
 
     >>> item.finish("I give my pledge, as a human\n"
@@ -355,3 +359,8 @@ Most process elements can have names and descriptions.
     >>> pd.applications['prepare'].description
     u'Prepare the initial draft'
 
+    >>> pd.activities['tech1'].__name__
+    u'Technical Review 1'
+    
+    >>> pd.participants['tech1'].__name__
+    u'Technical Reviewer 1'
