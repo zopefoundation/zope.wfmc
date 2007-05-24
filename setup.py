@@ -21,7 +21,7 @@ import os
 from setuptools import setup, find_packages
 
 setup(name='zope.wfmc',
-      version='3.4.0b1',
+      version='3.4.0',
       url='http://svn.zope.org/zope.wfmc',
       license='ZPL 2.1',
       description='Zope wfmc',
