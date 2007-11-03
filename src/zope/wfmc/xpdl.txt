@@ -1,3 +1,4 @@
+===========
 XPDL Import
 ===========
 
@@ -12,7 +13,7 @@ contains a definition for the publication example developed in the
 
     >>> from zope.wfmc import xpdl
     >>> import os
-    >>> package = xpdl.read(open(os.path.join(this_directory, 
+    >>> package = xpdl.read(open(os.path.join(this_directory,
     ...                                       'publication.xpdl')))
 
 This package contains a single definition:
@@ -137,7 +138,7 @@ and we'll define and register participant and application adapters:
     ...             # Reject if either tech reviewer rejects
     ...             self.activity.workItemFinished(
     ...                 self, False, changes1 + changes2, ())
-    ...           
+    ...
     ...         if changes1 or changes2:
     ...             # we won't do anyting if there are tech changes
     ...             self.activity.workItemFinished(
@@ -194,7 +195,7 @@ and we'll define and register participant and application adapters:
     ...     def start(self):
     ...         print "Rejected"
     ...         self.finish()
-    
+
     >>> integration.rejectWorkItem = Reject
 
 and a process context, so we can pass parameters:
@@ -216,7 +217,7 @@ Now, let's try out our process.  We'll follow the same steps we did in
     ActivityStarted(Activity(u'Publication.start'))
     ActivityFinished(Activity(u'Publication.start'))
     Author `bob` selected
-    Transition(Activity(u'Publication.start'), 
+    Transition(Activity(u'Publication.start'),
                Activity(u'Publication.prepare'))
     ActivityStarted(Activity(u'Publication.prepare'))
 
@@ -226,15 +227,15 @@ Now, let's try out our process.  We'll follow the same steps we did in
     ...             "the natural resources of my Country.")
     WorkItemFinished(u'prepare')
     ActivityFinished(Activity(u'Publication.prepare'))
-    Transition(Activity(u'Publication.prepare'), 
+    Transition(Activity(u'Publication.prepare'),
                Activity(u'Publication.tech1'))
     ActivityStarted(Activity(u'Publication.tech1'))
-    Transition(Activity(u'Publication.prepare'), 
+    Transition(Activity(u'Publication.prepare'),
                Activity(u'Publication.tech2'))
     ActivityStarted(Activity(u'Publication.tech2'))
 
     >>> item = tech1.work_list.pop()
-    >>> print item.getDoc()   
+    >>> print item.getDoc()
     I give my pledge, as an American
     to save, and faithfully to defend from waste
     the natural resources of my Country.
@@ -242,20 +243,20 @@ Now, let's try out our process.  We'll follow the same steps we did in
     >>> item.finish(True, ['Change "American" to "human"'])
     WorkItemFinished(u'tech_review')
     ActivityFinished(Activity(u'Publication.tech1'))
-    Transition(Activity(u'Publication.tech1'), 
+    Transition(Activity(u'Publication.tech1'),
                Activity(u'Publication.review'))
 
     >>> item = tech2.work_list.pop()
     >>> item.finish(True, ['Change "Country" to "planet"'])
     WorkItemFinished(u'tech_review')
     ActivityFinished(Activity(u'Publication.tech2'))
-    Transition(Activity(u'Publication.tech2'), 
+    Transition(Activity(u'Publication.tech2'),
                Activity(u'Publication.review'))
     ActivityStarted(Activity(u'Publication.review'))
     WorkItemFinished(u'ed_review')
     ActivityFinished(Activity(u'Publication.review'))
     Author `bob` selected
-    Transition(Activity(u'Publication.review'), 
+    Transition(Activity(u'Publication.review'),
                Activity(u'Publication.prepare'))
     ActivityStarted(Activity(u'Publication.prepare'))
 
@@ -274,7 +275,7 @@ Now, let's try out our process.  We'll follow the same steps we did in
     ...             "the natural resources of my planet.")
     WorkItemFinished(u'prepare')
     ActivityFinished(Activity(u'Publication.prepare'))
-    Transition(Activity(u'Publication.prepare'), 
+    Transition(Activity(u'Publication.prepare'),
                Activity(u'Publication.tech1'))
     ActivityStarted(Activity(u'Publication.tech1'))
     Transition(Activity(u'Publication.prepare'),
@@ -348,17 +349,18 @@ Now, let's try out our process.  We'll follow the same steps we did in
     >>> context.decision
     True
 
+
 Descriptions
-============
+------------
 
 Most process elements can have names and descriptions.
-    
+
     >>> pd.__name__
     u'Publication'
-    
+
     >>> pd.description
     u'This is the sample process'
-    
+
     >>> pd.applications['prepare'].__name__
     u'Prepare'
 
@@ -367,22 +369,22 @@ Most process elements can have names and descriptions.
 
     >>> pd.activities['tech1'].__name__
     u'Technical Review 1'
-    
+
     >>> pd.activities['tech1'].description
     u'This is the first Technical Review.'
-    
+
     >>> pd.participants['tech1'].__name__
     u'Technical Reviewer 1'
-    
+
     >>> pd.participants['tech1'].description
     u'He is a smart guy.'
-    
+
     >>> sorted([item.__name__ for item in pd.transitions])
         [u'Transition', u'Transition', u'Transition', u'Transition',
         u'Transition', u'Transition', u'Transition', u'Transition',
         u'Transition', u'Transition', u'Transition to Tech Review 1',
         u'Transition to Tech Review 2']
-    
+
     >>> sorted([item.description for item in pd.transitions])
         [None, None, None, None, None, None, None, None, None, None, None,
         u'Use this transition if there are editorial changes required.']
