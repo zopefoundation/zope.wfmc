@@ -91,8 +91,6 @@ def test_multiple_input_parameters():
     >>> proc = pd()
     >>> proc.start(99, 42)
     99 42
-    
-
     """
 
 def test_pickling():
@@ -123,7 +121,6 @@ def test_pickling():
 
     >>> import pickle
     >>> s = pickle.dumps(proc)
-
     """
 
 def test_inputoutput():
@@ -177,8 +174,8 @@ def test_inputoutput():
     >>> proc.start(1)
     >>> proc.workflowRelevantData.x
     2
-    
     """
+
 def test_wrong_number_process_args_error_message():
     """
 
@@ -197,20 +194,22 @@ def test_wrong_number_process_args_error_message():
     Traceback (most recent call last):
     ...
     TypeError: Too many arguments. Expected 0. got 1
-    
     """
-    
+
 
 def test_suite():
     from zope.testing import doctest
     suite = unittest.TestSuite()
-    suite.addTest(doctest.DocFileSuite('README.txt', tearDown=tearDown,
-                                       setUp=testing.setUp))
     suite.addTest(doctest.DocFileSuite(
-        'xpdl.txt', tearDown=tearDown, setUp=setUp,
+        'README.txt',
+        setUp=testing.setUp, tearDown=tearDown,
         optionflags=doctest.NORMALIZE_WHITESPACE))
-    suite.addTest(doctest.DocTestSuite(tearDown=testing.tearDown,
-                                       setUp=testing.setUp))
+    suite.addTest(doctest.DocFileSuite(
+        'xpdl.txt',
+        setUp=setUp, tearDown=tearDown,
+        optionflags=doctest.NORMALIZE_WHITESPACE))
+    suite.addTest(doctest.DocTestSuite(
+        setUp=testing.setUp, tearDown=testing.tearDown))
     return suite
 
 if __name__ == '__main__':

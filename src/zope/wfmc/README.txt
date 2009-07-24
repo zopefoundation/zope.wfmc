@@ -102,6 +102,9 @@ rejects the content for publication.  We can use a condition for this:
 
     >>> pd = process.ProcessDefinition('sample')
     >>> zope.component.provideUtility(pd, name=pd.id)
+    Unregistered event:
+    UtilityRegistration(<BaseGlobalComponents base>, IProcessDefinition,
+                        'sample', ProcessDefinition('sample'), None, u'')
 
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
@@ -337,6 +340,9 @@ example by passing it to the definition constructor:
 
     >>> pd = process.ProcessDefinition('sample', integration)
     >>> zope.component.provideUtility(pd, name=pd.id)
+    Unregistered event:
+    UtilityRegistration(<BaseGlobalComponents base>, IProcessDefinition,
+                        'sample', ProcessDefinition('sample'), None, u'')
 
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
@@ -410,6 +416,9 @@ redefine the process:
 
     >>> pd = process.ProcessDefinition('sample', integration)
     >>> zope.component.provideUtility(pd, name=pd.id)
+    Unregistered event:
+    UtilityRegistration(<BaseGlobalComponents base>, IProcessDefinition,
+                        'sample', ProcessDefinition('sample'), None, u'')
 
     >>> pd.defineActivities(
     ...     author = process.ActivityDefinition(),
