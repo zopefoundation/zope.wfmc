@@ -82,7 +82,7 @@ class IProcessDefinition(interface.Interface):
     applications = interface.Attribute(
         """Process applications
 
-        This is a mapping from application id to participant definitions
+        This is a mapping from application id to application definition
         """
         )
 
@@ -139,7 +139,7 @@ class IActivityDefinition(interface.Interface):
     description = interface.Attribute("Description")
 
     def addApplication(id, *parameters):
-        """Declare that the activity uses the identified activity
+        """Declare that the activity uses the identified application
 
         The application identifier must match an application declared
         for the process.
